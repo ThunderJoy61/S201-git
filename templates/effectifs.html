@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block titre %}Effectifs{% endblock %}
+
+{% block contenu %}
+<section class="card">
+    <h2>{{ prof.libelle }}</h2>
+    <p>
+        Territoire : <strong>{{ territoire_label }}</strong><br>
+        Année : <strong>{{ annee }}</strong>
+    </p>
+</section>
+
+<section class="card">
+    <h3>Résultats</h3>
+
+    {% if api_error %}
+        <p>{{ api_error }}</p>
+    {% elif resultats %}
+        {% set resultat = resultats[0] %}
+
+        <div class="result-summary">
+            <div>
+                <span>Effectif</span>
+                <strong>{{ resultat.effectif if resultat.effectif is not none else "Non disponible" }}</strong>
+            </div>
+            <div>
+                <span>Densité</span>
+                <strong>{{ resultat.densite if resultat.densite is not none else "Non disponible" }}</strong>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Année</th>
+                    <th>Effectif</th>
+                    <th>Densité</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in resultats %}
+                    <tr>
+                        <td>{{ r.annee }}</td>
+                        <td>{{ r.effectif }}</td>
+                        <td>{{ r.densite }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Aucune donnée disponible pour cette sélection.</p>
+    {% endif %}
+</section>
+
+<section class="card">
+    <h3>Évolution des effectifs</h3>
+    <canvas id="graphique"></canvas>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const donnees = {{ evolution|tojson }};
+
+    new Chart(document.getElementById("graphique"), {
+        type: "line",
+        data: {
+            labels: donnees.map(d => String(d.annee).substring(0, 4)),
+            datasets: [{
+                label: "Effectif",
+                data: donnees.map(d => d.effectif),
+                tension: 0.3
+            }]
+        }
+    });
+</script>
+{% endblock %}

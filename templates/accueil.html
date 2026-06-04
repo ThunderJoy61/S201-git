@@ -4,42 +4,56 @@
 
 {% block contenu %}
 <section class="hero">
-    <h2>Plateforme de visualisation des données de santé</h2>
+    <h2>Explorez les données de santé en France</h2>
     <p>
-        Ce site permet de consulter et d’analyser des données de santé issues de Data Ameli.
+        Sélectionnez une profession, une région, un département et une année
+        pour consulter les effectifs issus de Data Ameli.
     </p>
 </section>
 
 <section class="card">
-    <h3>Vérification de la base de données</h3>
+    <h3>Consulter les effectifs</h3>
 
-    <p>
-        La base contient actuellement :
-    </p>
+    <form action="{{ url_for('effectifs.afficher') }}" method="get" class="form-grid">
+        <div>
+            <label for="profession">Profession</label>
+            <select name="profession_id" id="profession" required>
+                <option value="">-- Choisir --</option>
+                {% for p in professions %}
+                    <option value="{{ p.id }}">{{ p.libelle }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-    <ul>
-        <li>{{ regions|length }} régions</li>
-        <li>{{ professions|length }} professions de santé</li>
-    </ul>
+        <div>
+            <label for="region">Région</label>
+            <select name="region_id" id="region" required>
+                <option value="">-- Choisir --</option>
+                {% for r in regions %}
+                    <option value="{{ r.id }}" data-code="{{ r.code }}" data-libelle="{{ r.libelle }}">{{ r.libelle }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="departement">Département</label>
+            <select name="departement_id" id="departement" required>
+                <option value="">-- Choisir une région --</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="annee">Année</label>
+            <select name="annee" id="annee" required>
+                {% for a in range(2023, 2014, -1) %}
+                    <option value="{{ a }}">{{ a }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit">Afficher les résultats</button>
+    </form>
 </section>
 
-<section class="grid">
-    <div class="card">
-        <h3>Quelques régions</h3>
-        <ul>
-            {% for region in regions[:10] %}
-                <li>{{ region.code }} — {{ region.libelle }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <div class="card">
-        <h3>Quelques professions</h3>
-        <ul>
-            {% for prof in professions[:10] %}
-                <li>{{ prof.libelle }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-</section>
+<script src="{{ url_for('static', filename='js/cascade.js') }}"></script>
 {% endblock %}
