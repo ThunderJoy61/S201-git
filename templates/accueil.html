@@ -1,10 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block titre %}Accueil{% endblock %}
+
+{% block contenu %}
+<section class="hero">
+    <h2>Plateforme de visualisation des données de santé</h2>
+    <p>
+        Ce site permet de consulter et d’analyser des données de santé issues de Data Ameli.
+    </p>
+</section>
+
+<section class="card">
+    <h3>Vérification de la base de données</h3>
+
+    <p>
+        La base contient actuellement :
+    </p>
+
+    <ul>
+        <li>{{ regions|length }} régions</li>
+        <li>{{ professions|length }} professions de santé</li>
+    </ul>
+</section>
+
+<section class="grid">
+    <div class="card">
+        <h3>Quelques régions</h3>
+        <ul>
+            {% for region in regions[:10] %}
+                <li>{{ region.code }} — {{ region.libelle }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="card">
+        <h3>Quelques professions</h3>
+        <ul>
+            {% for prof in professions[:10] %}
+                <li>{{ prof.libelle }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</section>
+{% endblock %}

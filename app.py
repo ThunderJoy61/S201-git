@@ -1,12 +1,11 @@
 from flask import Flask
+from config import Config
+from controllers.accueil import bp_accueil
 
 app = Flask(__name__)
+app.config.from_object(Config)
 
+app.register_blueprint(bp_accueil)
 
-@app.route('/')
-def hello_world():  # put application's code here
-    return 'Hello World!'
-
-
-if __name__ == '__main__':
-    app.run()
+if __name__ == "__main__":
+    app.run(debug=True)

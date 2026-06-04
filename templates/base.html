@@ -1,10 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>{% block titre %}Santé Data{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <header class="site-header">
+        <div class="container header-content">
+            <h1>Santé Data</h1>
+            <nav>
+                <a href="{{ url_for('accueil.index') }}">Accueil</a>
+            </nav>
+        </div>
+    </header>
 
+    <main class="container">
+        {% block contenu %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <p>SAE 2.01 · Données de santé · Data Ameli</p>
+    </footer>
 </body>
 </html>
