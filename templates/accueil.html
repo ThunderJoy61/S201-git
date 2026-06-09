@@ -79,8 +79,17 @@
         </div>
 
         <div>
-            <label for="annee">Année</label>
-            <select name="annee" id="annee" required>
+            <label for="first_year">Année de début</label>
+            <select name="first_year" id="first_year" required>
+                {% for a in range(2023, 2014, -1) %}
+                    <option value="{{ a }}">{{ a }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="last_year">Année de fin</label>
+            <select name="last_year" id="last_year" required>
                 {% for a in range(2023, 2014, -1) %}
                     <option value="{{ a }}">{{ a }}</option>
                 {% endfor %}

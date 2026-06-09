@@ -11,7 +11,11 @@
             Territoire sélectionné :
             <strong>{{ dept.code }} — {{ dept.libelle }}</strong>
             · Année :
-            <strong>{{ annee }}</strong>
+            {% if first_year == last_year %}
+                <strong>{{ first_year }}</strong>
+            {% else %}
+                <strong>de {{ first_year }} à {{ last_year }}</strong>
+            {% endif %}
         </p>
     </div>
 </section>

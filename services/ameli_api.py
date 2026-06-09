@@ -11,14 +11,18 @@ class AmeliAPI:
         self._session = requests.Session()
         self.last_error = None
 
-    def get_effectifs(self, profession, departement_code, annee, region_code=None):
+    def get_effectifs(self, profession, departement_code, first_year, last_year, region_code=None):
         """Effectifs pour une profession, un departement et une annee."""
+        y1 = int(first_year)
+        y2 = int(last_year)
+        f_year = min(y1, y2)
+        l_year = max(y1, y2)
 
         where = (
             f'profession_sante="{self._escape_value(profession)}" AND '
             f'{self._filtre_territoire(departement_code, region_code)} AND '
-            f'annee >= "{annee}-01-01" AND '
-            f'annee < "{annee + 1}-01-01" AND '
+            f'year(annee) >= {f_year} AND '
+            f'year(annee) <= {l_year} AND '
             f'libelle_classe_age="Tout âge" AND '
             f'libelle_sexe="tout sexe"'
         )

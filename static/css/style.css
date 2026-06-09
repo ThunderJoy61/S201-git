@@ -372,3 +372,7 @@ nav {
         text-align: center;
     }
 }
+
+button {
+    margin-top: 10px;
+}

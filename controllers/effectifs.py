@@ -13,7 +13,8 @@ def afficher():
     profession_id = request.args.get("profession_id", type=int)
     region_id = request.args.get("region_id", type=int)
     departement_id = request.args.get("departement_id", type=int)
-    annee = request.args.get("annee", type=int)
+    first_year = request.args.get("first_year", type=int)
+    last_year = request.args.get("last_year", type=int)
 
     session = Session()
 
@@ -23,7 +24,7 @@ def afficher():
         france_selectionnee = region and region.code == "99"
         dept = None if france_selectionnee else session.get(Departement, departement_id)
 
-        if not prof or not region or not annee or (not france_selectionnee and not dept):
+        if not prof or not region or not first_year or not last_year or (not france_selectionnee and not dept):
             return render_template(
                 "erreur.html",
                 message="Parametres manquants ou invalides.",
@@ -31,11 +32,11 @@ def afficher():
 
         if france_selectionnee:
             territoire_label = "FRANCE"
-            resultats = api.get_effectifs(prof.libelle, "999", annee, region.code)
+            resultats = api.get_effectifs(prof.libelle, "999", first_year, last_year, region.code)
             evolution = api.get_evolution_effectifs(prof.libelle, "999", region.code)
         else:
             territoire_label = f"{dept.code} - {dept.libelle}"
-            resultats = api.get_effectifs(prof.libelle, dept.code, annee)
+            resultats = api.get_effectifs(prof.libelle, dept.code, first_year, last_year)
             evolution = api.get_evolution_effectifs(prof.libelle, dept.code)
 
         return render_template(
@@ -44,7 +45,8 @@ def afficher():
             dept=dept,
             region=region,
             territoire_label=territoire_label,
-            annee=annee,
+            first_year=first_year,
+            last_year=last_year,
             resultats=resultats,
             evolution=evolution,
             api_error=api.last_error,
