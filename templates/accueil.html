@@ -4,21 +4,51 @@
 
 {% block contenu %}
 <section class="hero">
-    <h2>Explorez les données de santé en France</h2>
-    <p>
-        Sélectionnez une profession, une région, un département et une année
-        pour consulter les effectifs issus de Data Ameli.
-    </p>
+    <div>
+        <span class="hero-badge">Data Ameli · Santé publique</span>
+        <h2>Explorez les données de santé en France</h2>
+        <p>
+            Sélectionnez une profession de santé, un territoire et une année afin
+            de consulter les effectifs, les densités et leur évolution.
+        </p>
+    </div>
 </section>
 
-<section class="card">
-    <h3>Consulter les effectifs</h3>
+<section class="grid">
+    <div class="card">
+        <h3>Analyse rapide</h3>
+        <p>
+            Le formulaire ci-dessous interroge l’API Data Ameli en temps réel.
+            Les résultats sont ensuite affichés sous forme de tableau et de graphique.
+        </p>
+    </div>
+
+    <div class="card">
+        <h3>Données disponibles</h3>
+        <ul class="feature-list">
+            <li>{{ regions|length }} régions disponibles</li>
+            <li>{{ professions|length }} professions de santé</li>
+            <li>Analyse par département ou territoire</li>
+            <li>Visualisation graphique avec Chart.js</li>
+        </ul>
+    </div>
+</section>
+
+<section class="card form-card">
+    <div class="section-title">
+        <div>
+            <h3>Consulter les effectifs</h3>
+            <p>
+                Remplissez les champs ci-dessous pour lancer une analyse.
+            </p>
+        </div>
+    </div>
 
     <form action="{{ url_for('effectifs.afficher') }}" method="get" class="form-grid">
         <div>
             <label for="profession">Profession</label>
             <select name="profession_id" id="profession" required>
-                <option value="">-- Choisir --</option>
+                <option value="">-- Choisir une profession --</option>
                 {% for p in professions %}
                     <option value="{{ p.id }}">{{ p.libelle }}</option>
                 {% endfor %}
@@ -28,9 +58,15 @@
         <div>
             <label for="region">Région</label>
             <select name="region_id" id="region" required>
-                <option value="">-- Choisir --</option>
+                <option value="">-- Choisir une région --</option>
                 {% for r in regions %}
-                    <option value="{{ r.id }}" data-code="{{ r.code }}" data-libelle="{{ r.libelle }}">{{ r.libelle }}</option>
+                    <option
+                        value="{{ r.id }}"
+                        data-code="{{ r.code }}"
+                        data-libelle="{{ r.libelle }}"
+                    >
+                        {{ r.libelle }}
+                    </option>
                 {% endfor %}
             </select>
         </div>
@@ -53,6 +89,15 @@
 
         <button type="submit">Afficher les résultats</button>
     </form>
+</section>
+
+<section class="card info-card">
+    <h3>Comment lire les résultats ?</h3>
+    <p>
+        L’effectif correspond au nombre de professionnels de santé recensés pour
+        le territoire sélectionné. La densité permet de rapporter cet effectif à la
+        population du territoire, afin de faciliter les comparaisons.
+    </p>
 </section>
 
 <script src="{{ url_for('static', filename='js/cascade.js') }}"></script>

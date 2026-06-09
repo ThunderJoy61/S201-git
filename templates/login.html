@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block titre %}Connexion{% endblock %}
+
+{% block contenu %}
+<section class="auth-page">
+    <div class="auth-card">
+        <h2>Connexion</h2>
+        <p>Connectez-vous pour accéder au tableau de bord et aux visualisations internes.</p>
+
+        {% if erreur %}
+            <div class="alert-error">{{ erreur }}</div>
+        {% endif %}
+
+        <form method="post">
+            <label for="username">Identifiant</label>
+            <input type="text" name="username" id="username" required>
+
+            <label for="password">Mot de passe</label>
+            <input type="password" name="password" id="password" required>
+
+            <button type="submit">Se connecter</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

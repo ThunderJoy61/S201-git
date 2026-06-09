@@ -3,9 +3,16 @@
 {% block titre %}Erreur{% endblock %}
 
 {% block contenu %}
-<section class="card">
-    <h2>Erreur</h2>
-    <p>{{ message }}</p>
-    <a href="{{ url_for('accueil.index') }}">Retour à l’accueil</a>
+<section class="auth-page">
+    <div class="auth-card">
+        <h2>Une erreur est survenue</h2>
+        <p>{{ message }}</p>
+
+        <div class="actions-row">
+            <a href="{{ url_for('accueil.index') }}" class="btn-link">
+                Retour à l’accueil
+            </a>
+        </div>
+    </div>
 </section>
 {% endblock %}

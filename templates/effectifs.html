@@ -1,63 +1,120 @@
 {% extends "base.html" %}
 
-{% block titre %}Effectifs{% endblock %}
+{% block titre %}Résultats{% endblock %}
 
 {% block contenu %}
-<section class="card">
-    <h2>{{ prof.libelle }}</h2>
-    <p>
-        Territoire : <strong>{{ territoire_label }}</strong><br>
-        Année : <strong>{{ annee }}</strong>
-    </p>
+<section class="hero">
+    <div>
+        <span class="hero-badge">Résultats d’analyse</span>
+        <h2>{{ prof.libelle }}</h2>
+        <p>
+            Territoire sélectionné :
+            <strong>{{ dept.code }} — {{ dept.libelle }}</strong>
+            · Année :
+            <strong>{{ annee }}</strong>
+        </p>
+    </div>
 </section>
 
+<section class="actions-row">
+    <a href="{{ url_for('accueil.index') }}" class="btn-link secondary-btn">
+        Nouvelle recherche
+    </a>
+
+    <a href="{{ url_for('dashboard.index') }}" class="btn-link">
+        Retour dashboard
+    </a>
+</section>
+
+{% if resultats %}
+<section class="kpi-grid">
+    {% set premier = resultats[0] %}
+
+    <div class="kpi-card">
+        <span class="kpi-label">Année</span>
+        <strong>{{ premier.annee|string|truncate(4, True, '') }}</strong>
+    </div>
+
+    <div class="kpi-card">
+        <span class="kpi-label">Effectif</span>
+        <strong>{{ premier.effectif }}</strong>
+    </div>
+
+    <div class="kpi-card">
+        <span class="kpi-label">Densité</span>
+        <strong>{{ premier.densite }}</strong>
+    </div>
+
+    <div class="kpi-card">
+        <span class="kpi-label">Territoire</span>
+        <strong>{{ dept.code }}</strong>
+    </div>
+</section>
+{% endif %}
+
 <section class="card">
-    <h3>Résultats</h3>
-
-    {% if api_error %}
-        <p>{{ api_error }}</p>
-    {% elif resultats %}
-        {% set resultat = resultats[0] %}
-
-        <div class="result-summary">
-            <div>
-                <span>Effectif</span>
-                <strong>{{ resultat.effectif if resultat.effectif is not none else "Non disponible" }}</strong>
-            </div>
-            <div>
-                <span>Densité</span>
-                <strong>{{ resultat.densite if resultat.densite is not none else "Non disponible" }}</strong>
-            </div>
+    <div class="section-title">
+        <div>
+            <h3>Tableau des résultats</h3>
+            <p>
+                Données récupérées depuis l’API Data Ameli pour la sélection choisie.
+            </p>
         </div>
+    </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Année</th>
-                    <th>Effectif</th>
-                    <th>Densité</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for r in resultats %}
+    {% if resultats %}
+        <div class="table-wrapper">
+            <table>
+                <thead>
                     <tr>
-                        <td>{{ r.annee }}</td>
-                        <td>{{ r.effectif }}</td>
-                        <td>{{ r.densite }}</td>
+                        <th>Année</th>
+                        <th>Effectif</th>
+                        <th>Densité</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for r in resultats %}
+                        <tr>
+                            <td>{{ r.annee|string|truncate(10, True, '') }}</td>
+                            <td>{{ r.effectif }}</td>
+                            <td>{{ r.densite }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% else %}
-        <p>Aucune donnée disponible pour cette sélection.</p>
+        <div class="empty-state">
+            <h4>Aucune donnée disponible</h4>
+            <p>
+                L’API n’a retourné aucune valeur pour cette sélection. Essayez avec
+                une autre profession, un autre département ou une autre année.
+            </p>
+            <a href="{{ url_for('accueil.index') }}" class="btn-link">Modifier la recherche</a>
+        </div>
     {% endif %}
 </section>
 
 <section class="card">
-    <h3>Évolution des effectifs</h3>
-    <canvas id="graphique"></canvas>
+    <div class="section-title">
+        <div>
+            <h3>Évolution des effectifs</h3>
+            <p>
+                Ce graphique montre l’évolution des effectifs disponibles sur plusieurs années.
+            </p>
+        </div>
+    </div>
+
+    {% if evolution %}
+        <canvas id="graphique"></canvas>
+    {% else %}
+        <div class="empty-state">
+            <p>Aucune évolution disponible pour cette sélection.</p>
+        </div>
+    {% endif %}
 </section>
 
+{% if evolution %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const donnees = {{ evolution|tojson }};
@@ -71,7 +128,21 @@
                 data: donnees.map(d => d.effectif),
                 tension: 0.3
             }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
         }
     });
 </script>
+{% endif %}
 {% endblock %}

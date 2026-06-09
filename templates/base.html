@@ -8,9 +8,18 @@
 <body>
     <header class="site-header">
         <div class="container header-content">
-            <h1>Santé Data</h1>
+            <a href="{{ url_for('accueil.index') }}" class="logo">Santé Data</a>
+
             <nav>
                 <a href="{{ url_for('accueil.index') }}">Accueil</a>
+                <a href="{{ url_for('pages.presentation') }}">Données</a>
+
+                {% if session.get("user") %}
+                    <a href="{{ url_for('dashboard.index') }}">Dashboard</a>
+                    <a href="{{ url_for('auth.logout') }}">Déconnexion</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="nav-btn">Connexion</a>
+                {% endif %}
             </nav>
         </div>
     </header>

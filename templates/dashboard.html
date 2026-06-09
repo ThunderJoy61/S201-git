@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block titre %}Dashboard{% endblock %}
+
+{% block contenu %}
+<section class="hero">
+    <h2>Tableau de bord</h2>
+    <p>
+        Bienvenue {{ session.get("user") }}. Cette page regroupe les principaux
+        indicateurs de la base et les accès rapides aux analyses de santé.
+    </p>
+</section>
+
+<section class="kpi-grid">
+    <div class="kpi-card">
+        <span class="kpi-label">Régions</span>
+        <strong>{{ nb_regions }}</strong>
+    </div>
+
+    <div class="kpi-card">
+        <span class="kpi-label">Départements</span>
+        <strong>{{ nb_departements }}</strong>
+    </div>
+
+    <div class="kpi-card">
+        <span class="kpi-label">Professions</span>
+        <strong>{{ nb_professions }}</strong>
+    </div>
+
+    <div class="kpi-card">
+        <span class="kpi-label">Source</span>
+        <strong>Data Ameli</strong>
+    </div>
+</section>
+
+<section class="kpi-grid small-kpis">
+    <div class="kpi-card">
+        <span class="kpi-label">Types d’honoraires</span>
+        <strong>{{ nb_honoraires }}</strong>
+    </div>
+
+    <div class="kpi-card">
+        <span class="kpi-label">Types de prescriptions</span>
+        <strong>{{ nb_prescriptions }}</strong>
+    </div>
+
+    <div class="kpi-card">
+        <span class="kpi-label">Secteurs</span>
+        <strong>{{ nb_secteurs }}</strong>
+    </div>
+
+    <div class="kpi-card">
+        <span class="kpi-label">Visualisations</span>
+        <strong>Chart.js</strong>
+    </div>
+</section>
+
+<section class="grid">
+    <div class="card">
+        <h3>Analyse des effectifs</h3>
+        <p>
+            Consultez les effectifs et densités d’une profession de santé selon
+            une région, un département et une année.
+        </p>
+        <a href="{{ url_for('accueil.index') }}" class="btn-link">Ouvrir l’analyse</a>
+    </div>
+
+    <div class="card">
+        <h3>Présentation des données</h3>
+        <p>
+            Retrouvez l’origine des données, leur rôle dans l’application et leur
+            intérêt pour la visualisation.
+        </p>
+        <a href="{{ url_for('pages.presentation') }}" class="btn-link">Voir les données</a>
+    </div>
+</section>
+
+<section class="card">
+    <h3>Répartition des départements par région</h3>
+    <p>
+        Ce graphique permet de visualiser la couverture territoriale présente dans
+        la base de données.
+    </p>
+
+    <canvas id="regionsChart"></canvas>
+</section>
+
+<section class="card">
+    <h3>Fonctionnalités disponibles</h3>
+    <ul class="feature-list">
+        <li>Formulaire profession / région / département / année</li>
+        <li>Chargement dynamique des départements avec AJAX</li>
+        <li>Connexion à la base MySQL SAE 2.04</li>
+        <li>Appels dynamiques à l’API Data Ameli</li>
+        <li>Tableaux de résultats et graphiques Chart.js</li>
+        <li>Pages internes protégées par authentification</li>
+    </ul>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const repartitionRegions = {{ repartition_regions|tojson }};
+
+    new Chart(document.getElementById("regionsChart"), {
+        type: "bar",
+        data: {
+            labels: repartitionRegions.map(item => item.region),
+            datasets: [{
+                label: "Nombre de départements",
+                data: repartitionRegions.map(item => item.departements),
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        autoSkip: false,
+                        maxRotation: 70,
+                        minRotation: 45
+                    }
+                },
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

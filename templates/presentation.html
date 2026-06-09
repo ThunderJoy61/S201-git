@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block titre %}Présentation des données{% endblock %}
+
+{% block contenu %}
+<section class="hero">
+    <h2>Présentation des données Data Ameli</h2>
+    <p>
+        Cette plateforme exploite des données publiques de santé afin de les rendre
+        plus lisibles grâce à des tableaux, des indicateurs et des graphiques.
+    </p>
+</section>
+
+<section class="grid">
+    <div class="card">
+        <h3>Origine des données</h3>
+        <p>
+            Les données proviennent de la plateforme open data de l’Assurance Maladie.
+            Elles concernent notamment les professionnels de santé, les territoires,
+            les effectifs et les densités.
+        </p>
+    </div>
+
+    <div class="card">
+        <h3>Objectif de l’application</h3>
+        <p>
+            Le site permet de consulter rapidement des données de santé sans interroger
+            directement l’API. L’objectif est de proposer une interface claire,
+            moderne et pédagogique.
+        </p>
+    </div>
+</section>
+
+<section class="card">
+    <h3>Données exploitées</h3>
+    <ul>
+        <li>Professions de santé</li>
+        <li>Régions et départements français</li>
+        <li>Effectifs par profession et par territoire</li>
+        <li>Densités de professionnels de santé</li>
+        <li>Évolutions temporelles sous forme de graphiques</li>
+    </ul>
+</section>
+
+<section class="card">
+    <h3>Utilisation</h3>
+    <p>
+        L’utilisateur choisit une profession, une région, un département et une année.
+        L’application interroge ensuite l’API Data Ameli et affiche les résultats sous
+        une forme plus compréhensible.
+    </p>
+</section>
+{% endblock %}
