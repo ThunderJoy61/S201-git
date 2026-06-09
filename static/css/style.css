@@ -114,6 +114,7 @@ button {
     border: 1px solid var(--border);
     border-radius: 10px;
     font-size: 1rem;
+    margin-top: 10px;
 }
 
 button {
@@ -373,6 +374,12 @@ nav {
     }
 }
 
-button {
-    margin-top: 10px;
+.annee {
+    width: 250px;
+}
+
+.container-annee {
+    display: flex;
+    gap: 20px;
+    align-items: center;
 }

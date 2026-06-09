@@ -33,6 +33,7 @@ class AmeliAPI:
                 "select": "annee,effectif,densite",
                 "where": where,
                 "limit": 100,
+                "order_by": "annee",
             },
         )
 

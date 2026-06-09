@@ -9,12 +9,18 @@
         <h2>{{ prof.libelle }}</h2>
         <p>
             Territoire sélectionné :
-            <strong>{{ dept.code }} — {{ dept.libelle }}</strong>
-            · Année :
+            {% if dept.libelle %}
+                <strong>{{ dept.code }} — {{ dept.libelle }}</strong>
+            {% else %}
+                <strong>France entière</strong>
+            {% endif %}
+            · Année(s) :
             {% if first_year == last_year %}
                 <strong>{{ first_year }}</strong>
-            {% else %}
+            {% elif first_year < last_year %}
                 <strong>de {{ first_year }} à {{ last_year }}</strong>
+            {% elif last_year < first_year %}
+                <strong>de {{ last_year }} à {{ first_year }}</strong>
             {% endif %}
         </p>
     </div>
@@ -51,7 +57,11 @@
 
     <div class="kpi-card">
         <span class="kpi-label">Territoire</span>
-        <strong>{{ dept.code }}</strong>
+        {% if dept.libelle %}
+            <strong>{{ dept.libelle }}</strong>
+        {% else %}
+            <strong>France entière</strong>
+        {% endif %}
     </div>
 </section>
 {% endif %}
