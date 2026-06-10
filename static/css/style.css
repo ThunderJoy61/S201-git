@@ -50,7 +50,7 @@ nav a {
 .hero {
     margin: 40px 0 24px;
     padding: 36px;
-    background: linear-gradient(135deg, var(--blue), #2e74b5);
+    background: linear-gradient(130deg, #131038, var(--blue));
     color: white;
     border-radius: 18px;
 }
@@ -187,8 +187,8 @@ th {
 }
 
 .logo {
-    font-size: 1.4rem;
-    font-weight: 800;
+    font-size: 1.6rem;
+    font-weight: 650;
     color: var(--blue);
     text-decoration: none;
 }
