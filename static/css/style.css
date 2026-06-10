@@ -1,7 +1,7 @@
 :root {
     --blue: #0057A4;
     --light-blue: #EAF3FB;
-    --bg: #F7F9FC;
+    --bg: #f4f6f9;
     --text: #1f2937;
     --muted: #6b7280;
     --white: #ffffff;
@@ -13,6 +13,7 @@
 }
 
 body {
+    padding-top: 80px;
     margin: 0;
     font-family: "Segoe UI", Arial, sans-serif;
     background: var(--bg);
@@ -27,6 +28,13 @@ body {
 .site-header {
     background: var(--white);
     border-bottom: 1px solid var(--border);
+    position: absolute;
+    width: 72.5%;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 18px;
+    z-index: 1000;
 }
 
 .header-content {
@@ -63,7 +71,7 @@ nav a {
 .card {
     background: var(--white);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 18px;
     padding: 24px;
     margin-bottom: 20px;
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
@@ -246,7 +254,7 @@ nav {
 .kpi-card {
     background: white;
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 18px;
     padding: 22px;
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
 }
