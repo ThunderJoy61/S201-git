@@ -6,11 +6,65 @@
 <section class="hero">
     <div>
         <span class="hero-badge">Data Ameli · Santé publique</span>
-        <h2>Explorez les données de santé en France</h2>
+        <h2>Explorez les données de santé <br/> en France</h2>
         <p>
-            Sélectionnez une profession de santé, un territoire et une année afin
+            Sélectionnez une profession de santé, un territoire et une année <br/> afin
             de consulter les effectifs, les densités et leur évolution.
         </p>
+    </div>
+
+    <div class="hero-preview">
+        <h3>Vue Rapide</h3>
+        <div class="preview-kpi-grid">
+            <div class="preview-kpi-card">
+                <span class="preview-kpi-label">Nombre d'infirmiers en {{ preview[0].annee }}</span>
+                <strong>{{ preview[0].effectif }}</strong>
+                <div class="kpi-circle-icon"></div>
+            </div>
+            <div class="preview-kpi-card">
+                <span class="preview-kpi-label">Densité/100k hab.</span>
+                <strong>{{ preview[0].densite }}</strong>
+            </div>
+        </div>
+
+        <div class="preview-kpi-graph">
+            <span class="preview-kpi-label">Évolution de l'effectif aux cours des années</span>
+            <canvas id="graphique"></canvas>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                const donnees = {{ evolution|tojson }};
+
+                new Chart(document.getElementById("graphique"), {
+                    type: "line",
+                    data: {
+                        labels: donnees.map(d => String(d.annee).substring(0, 4)),
+                        datasets: [{
+                            label: "Effectif",
+                            data: donnees.map(d => d.effectif),
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                display: true
+                            },
+                            y: {
+                                display: true,
+                                beginAtZero: false,
+                                grace: "10%"
+                            }
+                        }
+                    }
+                });
+            </script>
+        </div>  
     </div>
 </section>
 

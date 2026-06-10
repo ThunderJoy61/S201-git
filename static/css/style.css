@@ -29,7 +29,7 @@ body {
     background: var(--white);
     border-bottom: 1px solid var(--border);
     position: absolute;
-    width: 72.5%;
+    width: min(1100px, 92%);
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
@@ -61,11 +61,28 @@ nav a {
     background: linear-gradient(130deg, #131038, var(--blue));
     color: white;
     border-radius: 18px;
+    display: grid;
+    align-items: center;
+    grid-template-columns: 1fr 1fr;
 }
 
 .hero h2 {
     margin-top: 0;
     font-size: 2rem;
+}
+
+.hero-preview {
+    background-color: var(--white);
+    border-radius: 18px;
+    color: var(--text);
+}
+
+.hero-preview h3 {
+    margin-left: 40px;
+}
+
+.hero-preview span {
+    margin-left: 10px;
 }
 
 .card {
@@ -269,6 +286,46 @@ nav {
 .kpi-card strong {
     color: var(--blue);
     font-size: 1.3rem;
+}
+
+.preview-kpi-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 16px;
+}
+
+.preview-kpi-card {
+    border-radius: 18px;
+    padding: 16px;
+    position: relative;
+    background-color: var(--light-blue);
+    width: 80%;
+    left: 9.5%;
+}
+
+.preview-kpi-graph {
+    border-radius: 18px;
+    padding: 16px;
+    position: relative;
+    background-color: var(--light-blue);
+    width: 80%;
+    left: 9.5%;
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.preview-kpi-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.preview-kpi-card strong {
+    font-size: 1.5rem;
+    color: #131038;
+    display: block;
+    margin-top: 4px;
 }
 
 .btn-link {
