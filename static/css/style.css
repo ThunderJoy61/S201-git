@@ -300,7 +300,7 @@ nav {
     position: relative;
     background-color: var(--light-blue);
     width: 80%;
-    left: 9.5%;
+    margin: auto;
 }
 
 .preview-kpi-graph {
@@ -309,6 +309,7 @@ nav {
     position: relative;
     background-color: var(--light-blue);
     width: 80%;
+    height: 160px;
     left: 9.5%;
     margin-top: 16px;
     margin-bottom: 16px;
