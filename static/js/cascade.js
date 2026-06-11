@@ -33,6 +33,11 @@ if (regionSelect && departementSelect) {
             const response = await fetch(`/api/departements/${regionId}`);
             const departements = await response.json();
 
+            const optionTous = document.createElement("option");
+            optionTous.value = "all";
+            optionTous.textContent = "Tous les départements de la région";
+            departementSelect.appendChild(optionTous);
+
             for (const dept of departements) {
                 const option = document.createElement("option");
                 option.value = dept.id;

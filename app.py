@@ -10,7 +10,6 @@ from controllers.dashboard import bp_dashboard
 
 app = Flask(__name__)
 app.config.from_object(Config)
-
 app.register_blueprint(bp_accueil)
 app.register_blueprint(bp_api)
 app.register_blueprint(bp_effectifs)

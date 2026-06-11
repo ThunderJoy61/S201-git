@@ -12,7 +12,7 @@ api = AmeliAPI()
 def afficher():
     profession_id = request.args.get("profession_id", type=int)
     region_id = request.args.get("region_id", type=int)
-    departement_id = request.args.get("departement_id", type=int)
+    departement_selection = request.args.get("departement_id")
     first_year = request.args.get("first_year", type=int)
     last_year = request.args.get("last_year", type=int)
 
@@ -22,9 +22,23 @@ def afficher():
         prof = session.get(ProfessionSante, profession_id)
         region = session.get(Region, region_id)
         france_selectionnee = region and region.code == "99"
-        dept = None if france_selectionnee else session.get(Departement, departement_id)
+        region_entiere_selectionnee = departement_selection == "all"
+        dept = None
 
-        if not prof or not region or not first_year or not last_year or (not france_selectionnee and not dept):
+        if not france_selectionnee and not region_entiere_selectionnee and departement_selection:
+            try:
+                dept = session.get(Departement, int(departement_selection))
+            except ValueError:
+                dept = None
+
+        if (
+            not prof
+            or not region
+            or not first_year
+            or not last_year
+            or (not france_selectionnee and not region_entiere_selectionnee and not dept)
+            or (dept and dept.region_id != region.id)
+        ):
             return render_template(
                 "erreur.html",
                 message="Parametres manquants ou invalides.",
@@ -32,6 +46,10 @@ def afficher():
 
         if france_selectionnee:
             territoire_label = "FRANCE"
+            resultats = api.get_effectifs(prof.libelle, "999", first_year, last_year, region.code)
+            evolution = api.get_evolution_effectifs(prof.libelle, "999", region.code)
+        elif region_entiere_selectionnee:
+            territoire_label = region.libelle
             resultats = api.get_effectifs(prof.libelle, "999", first_year, last_year, region.code)
             evolution = api.get_evolution_effectifs(prof.libelle, "999", region.code)
         else:
