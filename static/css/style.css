@@ -21,7 +21,6 @@ html {
 
 body {
     margin: 0;
-    padding-top: 104px;
     font-family: "Segoe UI", Arial, sans-serif;
     background:
         radial-gradient(circle at top left, rgba(0, 87, 164, 0.12), transparent 32%),
@@ -34,18 +33,20 @@ body {
     margin: auto;
 }
 
-/* Header */
+/* HEADER PRINCIPAL NON FIXE */
 
 .site-header {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    z-index: 10;
+
+    width: min(1140px, 92%);
+    margin: 20px auto 0;
     background: rgba(255, 255, 255, 0.92);
     border: 1px solid var(--border);
-    position: fixed;
-    width: min(1140px, 92%);
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
     border-radius: 999px;
-    z-index: 1000;
     box-shadow: var(--shadow);
     backdrop-filter: blur(12px);
 }
@@ -58,6 +59,9 @@ body {
 }
 
 .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
     font-size: 1.6rem;
     font-weight: 800;
     color: var(--blue);
@@ -65,12 +69,21 @@ body {
     letter-spacing: -0.03em;
 }
 
+.logo-img {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    display: block;
+}
+
+.main-nav,
 nav {
     display: flex;
     align-items: center;
     gap: 18px;
 }
 
+.main-nav a,
 nav a {
     color: var(--blue-dark);
     text-decoration: none;
@@ -78,6 +91,7 @@ nav a {
     font-size: 0.95rem;
 }
 
+.main-nav a:hover,
 nav a:hover {
     color: var(--blue);
 }
@@ -89,7 +103,103 @@ nav a:hover {
     border-radius: 999px;
 }
 
-/* Layout global */
+.nav-btn-light {
+    background: var(--blue-soft);
+    color: var(--blue) !important;
+    border: 1px solid var(--border);
+}
+
+.nav-disabled {
+    color: var(--muted) !important;
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+/* MENU LATÉRAL AU SCROLL */
+
+.side-menu {
+    position: fixed;
+    top: 50%;
+    left: 24px;
+    transform: translate(-140%, -50%) scale(0.96);
+    width: 150px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(14px);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+        transform 0.28s ease,
+        opacity 0.28s ease;
+}
+
+.side-menu.side-menu-visible {
+    transform: translate(0, -50%) scale(1);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.side-menu-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 8px 14px;
+    margin-bottom: 8px;
+    text-decoration: none;
+    color: var(--blue);
+    font-weight: 900;
+    border-bottom: 1px solid var(--border);
+}
+
+.side-logo-img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
+.side-menu-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.side-menu-nav a {
+    display: flex;
+    align-items: center;
+    min-height: 42px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    color: var(--blue-dark);
+    text-decoration: none;
+    font-weight: 800;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.side-menu-nav a:hover {
+    background: var(--blue-soft);
+    color: var(--blue);
+    transform: translateX(3px);
+}
+
+.side-disabled {
+    color: var(--muted) !important;
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.side-disabled:hover {
+    transform: none !important;
+    background: transparent !important;
+}
+
+/* LAYOUT GLOBAL */
 
 main.container {
     min-height: 70vh;
@@ -97,13 +207,35 @@ main.container {
 
 .site-footer {
     margin-top: 70px;
-    padding: 28px;
-    text-align: center;
+    padding: 28px 0;
     color: var(--muted);
     border-top: 1px solid var(--border);
 }
 
-/* Home hero */
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+}
+
+.footer-content p {
+    margin: 6px 0 0;
+}
+
+.footer-links {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.footer-links a {
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+/* HOME HERO */
 
 .home-hero {
     display: grid;
@@ -177,6 +309,8 @@ main.container {
     margin-top: 30px;
 }
 
+/* BOUTONS */
+
 .btn-primary,
 .btn-secondary,
 .btn-link {
@@ -209,7 +343,13 @@ main.container {
     border: 1px solid var(--border);
 }
 
-/* Hero preview */
+button:hover,
+.btn-primary:hover,
+.btn-link:hover {
+    opacity: 0.92;
+}
+
+/* HERO PREVIEW */
 
 .hero-preview-card {
     background: var(--surface);
@@ -306,7 +446,7 @@ main.container {
     color: var(--muted);
 }
 
-/* Stats and cards */
+/* STATS / CARDS */
 
 .home-stats,
 .kpi-grid {
@@ -375,7 +515,7 @@ main.container {
     margin-bottom: 8px;
 }
 
-/* Forms */
+/* FORMULAIRES */
 
 .form-card {
     margin-top: 28px;
@@ -445,12 +585,6 @@ button {
     font-weight: 900;
 }
 
-button:hover,
-.btn-primary:hover,
-.btn-link:hover {
-    opacity: 0.92;
-}
-
 .container-annee {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -461,7 +595,7 @@ button:hover,
     width: 100%;
 }
 
-/* Tables / results pages */
+/* TABLEAUX / RÉSULTATS */
 
 table {
     width: 100%;
@@ -502,7 +636,7 @@ th {
     text-align: center;
 }
 
-/* Auth */
+/* AUTH */
 
 .auth-page {
     min-height: 65vh;
@@ -529,7 +663,7 @@ th {
     margin-bottom: 16px;
 }
 
-/* Dashboard */
+/* DASHBOARD */
 
 .kpi-card strong {
     color: var(--blue);
@@ -540,13 +674,15 @@ canvas {
     max-height: 430px;
 }
 
-/* Responsive */
+/* RESPONSIVE */
+
+@media (max-width: 1050px) {
+    .side-menu {
+        display: none;
+    }
+}
 
 @media (max-width: 980px) {
-    body {
-        padding-top: 132px;
-    }
-
     .site-header {
         border-radius: 24px;
     }
@@ -556,6 +692,7 @@ canvas {
         gap: 14px;
     }
 
+    .main-nav,
     nav {
         flex-wrap: wrap;
         justify-content: center;
@@ -575,13 +712,18 @@ canvas {
     .grid {
         grid-template-columns: 1fr;
     }
+
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-links {
+        justify-content: center;
+    }
 }
 
 @media (max-width: 700px) {
-    body {
-        padding-top: 150px;
-    }
-
     .home-hero-content {
         padding: 30px;
         min-height: auto;
