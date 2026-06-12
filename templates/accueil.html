@@ -3,105 +3,133 @@
 {% block titre %}Accueil{% endblock %}
 
 {% block contenu %}
-<section class="hero">
-    <div>
-        <span class="hero-badge">Data Ameli · Santé publique</span>
-        <h2>Explorez les données de santé <br/> en France</h2>
+<section class="home-hero">
+    <div class="home-hero-content">
+        <span class="hero-badge">Data Ameli · Visualisation santé</span>
+
+        <h1>Explorez les données de santé françaises avec DataLynx</h1>
+
         <p>
-            Sélectionnez une profession de santé, un territoire et une année <br/> afin
-            de consulter les effectifs, les densités et leur évolution.
+            DataLynx transforme les données publiques de l’Assurance Maladie en
+            indicateurs lisibles, tableaux et graphiques pour mieux comprendre la
+            répartition des professionnels de santé sur le territoire.
         </p>
+
+        <div class="hero-actions">
+            <a href="#analyse" class="btn-primary">Lancer une analyse</a>
+            <a href="{{ url_for('pages.presentation') }}" class="btn-secondary">Comprendre les données</a>
+        </div>
     </div>
 
-    <div class="hero-preview">
-        <h3>Vue Rapide</h3>
-        <div class="preview-kpi-grid">
-            <div class="preview-kpi-card">
-                <span class="preview-kpi-label">Nombre d'infirmiers en {{ preview[0].annee }}</span>
-                <strong>{{ preview[0].effectif }}</strong>
-                <div class="kpi-circle-icon"></div>
+    <aside class="hero-preview-card">
+        <div class="preview-header">
+            <div>
+                <span class="mini-label">Vue rapide</span>
+                <h2>Infirmiers · France</h2>
             </div>
-            <div class="preview-kpi-card">
-                <span class="preview-kpi-label">Densité/100k hab.</span>
-                <strong>{{ preview[0].densite }}</strong>
-            </div>
+            <span class="status-pill">API live</span>
         </div>
 
-        <div class="preview-kpi-graph">
-            <span class="preview-kpi-label">Évolution de l'effectif aux cours des années</span>
-            <canvas id="graphique"></canvas>
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-            <script>
-                const donnees = {{ evolution|tojson }};
+        {% if preview_item %}
+            <div class="preview-kpi-grid">
+                <div class="preview-kpi-card">
+                    <span class="preview-kpi-label">Effectif {{ preview_item.annee|string|truncate(4, True, '') }}</span>
+                    <strong>{{ preview_item.effectif }}</strong>
+                </div>
 
-                new Chart(document.getElementById("graphique"), {
-                    type: "line",
-                    data: {
-                        labels: donnees.map(d => String(d.annee).substring(0, 4)),
-                        datasets: [{
-                            label: "Effectif",
-                            data: donnees.map(d => d.effectif),
-                            tension: 0.3
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            x: {
-                                display: true
-                            },
-                            y: {
-                                display: true,
-                                beginAtZero: false,
-                                grace: "10%"
-                            }
-                        }
-                    }
-                });
-            </script>
-        </div>  
+                <div class="preview-kpi-card">
+                    <span class="preview-kpi-label">Densité</span>
+                    <strong>{{ preview_item.densite }}</strong>
+                </div>
+            </div>
+        {% else %}
+            <div class="empty-mini">
+                <p>Aperçu temporairement indisponible.</p>
+            </div>
+        {% endif %}
+
+        <div class="preview-chart-box">
+            <span class="preview-kpi-label">Évolution des effectifs</span>
+
+            {% if evolution %}
+                <canvas id="homePreviewChart"></canvas>
+            {% else %}
+                <p class="muted-text">Aucune donnée d’évolution disponible.</p>
+            {% endif %}
+        </div>
+
+        {% if api_error %}
+            <p class="api-warning">Aperçu API incomplet : {{ api_error }}</p>
+        {% endif %}
+    </aside>
+</section>
+
+<section class="home-stats">
+    <div class="stat-card">
+        <span>Régions disponibles</span>
+        <strong>{{ regions|length }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>Professions suivies</span>
+        <strong>{{ professions|length }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>Source</span>
+        <strong>Data Ameli</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>Affichage</span>
+        <strong>Chart.js</strong>
     </div>
 </section>
 
-<section class="grid">
-    <div class="card">
-        <h3>Analyse rapide</h3>
+<section class="section-grid">
+    <article class="card">
+        <span class="card-icon">01</span>
+        <h3>Choisir un territoire</h3>
         <p>
-            Le formulaire ci-dessous interroge l’API Data Ameli en temps réel.
-            Les résultats sont ensuite affichés sous forme de tableau et de graphique.
+            Sélectionnez une région puis un département. Le chargement des départements
+            se fait automatiquement grâce à une requête AJAX.
         </p>
-    </div>
+    </article>
 
-    <div class="card">
-        <h3>Données disponibles</h3>
-        <ul class="feature-list">
-            <li>{{ regions|length }} régions disponibles</li>
-            <li>{{ professions|length }} professions de santé</li>
-            <li>Analyse par département ou territoire</li>
-            <li>Visualisation graphique avec Chart.js</li>
-        </ul>
-    </div>
+    <article class="card">
+        <span class="card-icon">02</span>
+        <h3>Analyser une profession</h3>
+        <p>
+            Choisissez une profession de santé et une période afin d’obtenir des
+            données contextualisées sur les effectifs et densités.
+        </p>
+    </article>
+
+    <article class="card">
+        <span class="card-icon">03</span>
+        <h3>Visualiser les résultats</h3>
+        <p>
+            Les résultats sont présentés sous forme de tableau et de graphique pour
+            faciliter la lecture et la comparaison.
+        </p>
+    </article>
 </section>
 
-<section class="card form-card">
+<section class="card form-card" id="analyse">
     <div class="section-title">
         <div>
-            <h3>Consulter les effectifs</h3>
+            <span class="mini-label">Analyse principale</span>
+            <h2>Consulter les effectifs</h2>
             <p>
-                Remplissez les champs ci-dessous pour lancer une analyse.
+                Remplissez le formulaire pour interroger l’API Data Ameli et afficher
+                les données correspondant à votre sélection.
             </p>
         </div>
     </div>
 
     <form action="{{ url_for('effectifs.afficher') }}" method="get" class="form-grid">
-        <div>
-            <label for="profession">Profession</label>
+        <div class="form-field">
+            <label for="profession">Profession de santé</label>
             <select name="profession_id" id="profession" required>
                 <option value="">-- Choisir une profession --</option>
                 {% for p in professions %}
@@ -110,7 +138,7 @@
             </select>
         </div>
 
-        <div>
+        <div class="form-field">
             <label for="region">Région</label>
             <select name="region_id" id="region" required>
                 <option value="">-- Choisir une région --</option>
@@ -126,28 +154,28 @@
             </select>
         </div>
 
-        <div>
+        <div class="form-field">
             <label for="departement">Département</label>
             <select name="departement_id" id="departement" required>
-                <option value="">-- Choisir une région --</option>
+                <option value="">-- Choisir une région d’abord --</option>
             </select>
         </div>
 
         <div class="container-annee">
-            <div class="annee">
+            <div class="form-field annee">
                 <label for="first_year">Année de début</label>
                 <select name="first_year" id="first_year" required>
                     {% for a in range(2010, 2025) %}
-                        <option value="{{ a }}">{{ a }}</option>
+                        <option value="{{ a }}" {% if a == 2020 %}selected{% endif %}>{{ a }}</option>
                     {% endfor %}
                 </select>
             </div>
 
-            <div class="annee">
+            <div class="form-field annee">
                 <label for="last_year">Année de fin</label>
                 <select name="last_year" id="last_year" required>
                     {% for a in range(2024, 2009, -1) %}
-                        <option value="{{ a }}">{{ a }}</option>
+                        <option value="{{ a }}" {% if a == 2024 %}selected{% endif %}>{{ a }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -157,14 +185,65 @@
     </form>
 </section>
 
-<section class="card info-card">
-    <h3>Comment lire les résultats ?</h3>
-    <p>
-        L’effectif correspond au nombre de professionnels de santé recensés pour
-        le territoire sélectionné. La densité permet de rapporter cet effectif à la
-        population du territoire, afin de faciliter les comparaisons.
-    </p>
+<section class="section-grid two-cols">
+    <article class="card info-card">
+        <h3>Comment lire les résultats ?</h3>
+        <p>
+            L’effectif correspond au nombre de professionnels de santé recensés sur
+            le territoire choisi. La densité rapporte cet effectif à la population
+            afin de rendre les comparaisons plus pertinentes.
+        </p>
+    </article>
+
+    <article class="card">
+        <h3>Pourquoi cette interface ?</h3>
+        <p>
+            Les données brutes d’open data sont souvent difficiles à exploiter.
+            DataLynx les rend plus accessibles grâce à une navigation claire,
+            des graphiques et des indicateurs synthétiques.
+        </p>
+    </article>
 </section>
+
+{% if evolution %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const homeEvolution = {{ evolution|tojson }};
+
+    new Chart(document.getElementById("homePreviewChart"), {
+        type: "line",
+        data: {
+            labels: homeEvolution.map(d => String(d.annee).substring(0, 4)),
+            datasets: [{
+                label: "Effectif",
+                data: homeEvolution.map(d => d.effectif),
+                tension: 0.35,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        maxTicksLimit: 5
+                    }
+                },
+                y: {
+                    beginAtZero: false,
+                    grace: "10%"
+                }
+            }
+        }
+    });
+</script>
+{% endif %}
 
 <script src="{{ url_for('static', filename='js/cascade.js') }}"></script>
 {% endblock %}
