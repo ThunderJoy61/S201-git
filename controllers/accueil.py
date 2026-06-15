@@ -17,7 +17,7 @@ def index():
         regions = session.query(Region).order_by(Region.libelle).all()
         professions = session.query(ProfessionSante).order_by(ProfessionSante.libelle).all()
 
-        preview = api.get_effectifs("Infirmiers", "999", 2020, 2024, "99")
+        preview = api.get_effectifs("Infirmiers", "999", 2010, 2024, "99")
         evolution = api.get_evolution_effectifs("Infirmiers", "999", "99")
 
         preview_item = preview[-1] if preview else None

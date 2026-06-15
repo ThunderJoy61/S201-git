@@ -166,7 +166,7 @@
                 <label for="first_year">Année de début</label>
                 <select name="first_year" id="first_year" required>
                     {% for a in range(2010, 2025) %}
-                        <option value="{{ a }}" {% if a == 2020 %}selected{% endif %}>{{ a }}</option>
+                        <option value="{{ a }}" {% if a == 2010 %}selected{% endif %}>{{ a }}</option>
                     {% endfor %}
                 </select>
             </div>
