@@ -35,6 +35,7 @@
 {% if resultats %}
 <section class="kpi-grid">
     {% set premier = resultats[0] %}
+    {% set dernier = resultats[-1] %}
 
     <div class="kpi-card">
         <span class="kpi-label">Année</span>
@@ -55,6 +56,27 @@
         <span class="kpi-label">Territoire</span>
         <strong>{{ territoire_label }}</strong>
     </div>
+
+    <div class="kpi-card">
+        <span class="kpi-label">Année</span>
+        <strong>{{ dernier.annee|string|truncate(4, True, '') }}</strong>
+    </div>
+
+    <div class="kpi-card">
+        <span class="kpi-label">Effectif</span>
+        <strong>{{ dernier.effectif }}</strong>
+    </div>
+
+    <div class="kpi-card">
+        <span class="kpi-label">Densité</span>
+        <strong>{{ dernier.densite }}</strong>
+    </div>
+
+    <div class="kpi-card">
+        <span class="kpi-label">Évolution de l'effectif</span>
+        <strong>{{ ((dernier.effectif - premier.effectif) / premier.effectif * 100) | round(2) }} %</strong>
+    </div>
+
 </section>
 {% endif %}
 
@@ -139,7 +161,7 @@
             responsive: true,
             plugins: {
                 legend: {
-                    display: true
+                    display: false
                 }
             },
             scales: {

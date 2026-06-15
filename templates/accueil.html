@@ -164,7 +164,7 @@
         <div class="container-annee">
             <div class="form-field annee">
                 <label for="first_year">Année de début</label>
-                <select name="first_year" id="first_year" required>
+                <select name="first_year" id="first_year" required onchange="document.querySelectorAll('#last_year option').forEach(o => o.hidden = o.value < this.value)">
                     {% for a in range(2010, 2025) %}
                         <option value="{{ a }}" {% if a == 2010 %}selected{% endif %}>{{ a }}</option>
                     {% endfor %}
@@ -173,7 +173,7 @@
 
             <div class="form-field annee">
                 <label for="last_year">Année de fin</label>
-                <select name="last_year" id="last_year" required>
+                <select name="last_year" id="last_year" required onchange="document.querySelectorAll('#first_year option').forEach(o => o.hidden = o.value > this.value)">
                     {% for a in range(2024, 2009, -1) %}
                         <option value="{{ a }}" {% if a == 2024 %}selected{% endif %}>{{ a }}</option>
                     {% endfor %}
