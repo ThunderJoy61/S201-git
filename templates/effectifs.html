@@ -74,7 +74,11 @@
 
     <div class="kpi-card">
         <span class="kpi-label">Évolution de l'effectif</span>
-        <strong>{{ ((dernier.effectif - premier.effectif) / premier.effectif * 100) | round(2) }} %</strong>
+        {% if premier.effectif == 0 %}
+            <strong>0 %</strong>
+        {% else %}
+            <strong>{{ ((dernier.effectif - premier.effectif) / premier.effectif * 100) | round(2) }} %</strong>
+        {% endif %}
     </div>
 
 </section>
