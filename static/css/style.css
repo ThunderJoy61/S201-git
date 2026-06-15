@@ -761,7 +761,3 @@ canvas {
         text-align: center;
     }
 }
-
-.texte-majuscule {
-    text-transform: capitalize;
-}
