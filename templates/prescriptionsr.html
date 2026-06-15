@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block titre %}Résultats d'analyses{% endblock %}
+
+{% block contenu %}
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<section class="hero">
+    <div>
+        <span class="hero-badge">Résultats d’analyse</span>
+        <h2>{{ prescriptions.libelle|capitalize }}</h2>
+        <p>
+            Territoire sélectionné :
+            <strong>{{ territoire_label }}</strong>
+            · Année(s) :
+            <strong>{{ year }}</strong>
+        </p>
+    </div>
+</section>
+
+<section class="actions-row">
+    <a href="{{ url_for('prescriptions.index') }}" class="btn-link secondary-btn">
+        Nouvelle recherche
+    </a>
+
+    <a href="{{ url_for('dashboard.index') }}" class="btn-link">
+        Retour dashboard
+    </a>
+</section>
+
+{% if resultats %}
+{% endif %}
+
+<section class="card">
+    <div class="section-title">
+        <div>
+            <h3>Tableau des résultats</h3>
+            <p>
+                Données récupérées depuis l’API Data Ameli pour la sélection choisie.
+            </p>
+        </div>
+    </div>
+
+    {% if resultats %}
+        <div class="table-wrapper">
+            <table id="TabPrescriptions">
+                <thead>
+                    <tr>
+                        <th>Année</th>
+                        <th>Profession</th>
+                        <th>Poste</th>
+                        <th>Montant total (en €)</th>
+                        <th>Montant moyen (en €)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in resultats %}
+                        <tr>
+                            <td>{{ r.annee|string|truncate(10, True, '') }}</td>
+                            <td>{{ r.profession_sante|capitalize }}</td>
+                            <td>{{ r.libelle_poste_prescription[0]|upper }}{{ r.libelle_poste_prescription[1:] }}</td>
+                            <td> {{ r.montant_total_prescription_integer }}</td>
+                            <td>{{ r.montant_moyen_prescription_integer }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <script>
+            $(document).ready(function() {
+                $('#TabPrescriptions').DataTable({
+                    "paging": false,
+                    "searching": true,
+                    "ordering": false,
+                    "info": false,
+                    "language": {
+                        "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json"
+                    }
+                });
+            });
+        </script>
+    {% else %}
+        <div class="empty-state">
+            <h4>Aucune donnée disponible</h4>
+            <p>
+                L’API n’a retourné aucune valeur pour cette sélection. Essayez avec
+                une autre profession, un autre département ou une autre année.
+            </p>
+            <a href="{{ url_for('prescriptions.index') }}" class="btn-link">Modifier la recherche</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

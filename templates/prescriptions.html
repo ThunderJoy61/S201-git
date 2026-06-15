@@ -15,13 +15,13 @@
         </div>
     </div>
 
-    <form action="{{ url_for('effectifs.afficher') }}" method="get" class="form-grid">
+    <form action="{{ url_for('prescriptions.resultats') }}" method="get" class="form-grid">
         <div class="form-field">
             <label for="prescriptions">Types de prescriptions</label>
-            <select name="prescriptions_id" id="prescriptions" required>
+            <select name="prescription_id" id="prescriptions" required>
                 <option value="">-- Choisir un type de prescription --</option>
                 {% for p in prescriptions %}
-                    <option value="{{ p.id }}">{{ p.libelle }}</option>
+                    <option value="{{ p.id }}">{{ p.libelle[0]|upper }}{{ p.libelle[1:] }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -49,27 +49,19 @@
             </select>
         </div>
 
-        <div class="container-annee">
-            <div class="form-field annee">
-                <label for="first_year">Année de début</label>
-                <select name="first_year" id="first_year" required onchange="document.querySelectorAll('#last_year option').forEach(o => o.hidden = o.value < this.value)">
-                    {% for a in range(2010, 2025) %}
-                        <option value="{{ a }}" {% if a == 2010 %}selected{% endif %}>{{ a }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="form-field annee">
-                <label for="last_year">Année de fin</label>
-                <select name="last_year" id="last_year" required onchange="document.querySelectorAll('#first_year option').forEach(o => o.hidden = o.value > this.value)">
-                    {% for a in range(2024, 2009, -1) %}
-                        <option value="{{ a }}" {% if a == 2024 %}selected{% endif %}>{{ a }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+        <div class="form-field">
+            <label for="first_year">Année</label>
+            <select name="year" id="year" required>
+                {% for a in range(2010, 2025) %}
+                    <option value="{{ a }}" {% if a == 2024 %}selected{% endif %}>{{ a }}</option>
+                {% endfor %}
+            </select>
         </div>
+    
 
         <button type="submit">Afficher les résultats</button>
     </form>
 </section>
+
+<script src="{{ url_for('static', filename='js/cascade.js') }}"></script>
 {% endblock %}
