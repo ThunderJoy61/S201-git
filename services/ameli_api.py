@@ -35,6 +35,7 @@ class AmeliAPI:
                 "limit": 100,
                 "order_by": "annee",
             },
+            normalisateur=self._normaliser_resultat
         )
 
     def get_evolution_effectifs(self, profession, departement_code, region_code=None):
@@ -57,7 +58,7 @@ class AmeliAPI:
             },
         )
 
-    def _requete(self, dataset, params):
+    def _requete(self, dataset, params, normalisateur=None):
         url = f"{self.BASE_URL}/{dataset}/records"
         self.last_error = None
 
@@ -74,7 +75,11 @@ class AmeliAPI:
             print(response.text[:1000])
 
             response.raise_for_status()
-            return [self._normaliser_resultat(r) for r in response.json().get("results", [])]
+
+            if normalisateur:
+                return [normalisateur(r) for r in response.json().get("results", [])]
+            return response.json().get("results", [])
+        
         except requests.RequestException as e:
             self.last_error = f"Erreur lors de l'appel Data Ameli : {e}"
             print(f"[AmeliAPI] {self.last_error}")
@@ -118,3 +123,23 @@ class AmeliAPI:
             return value
 
         return int(nombre) if nombre.is_integer() else nombre
+    
+    def get_prescriptions(self, type_prescription, departement_code, year, region_code=None):
+        """Effectifs pour un type de prescriptions, un departement et une annee."""
+
+        where = (
+            f'libelle_poste_prescription="{self._escape_value(type_prescription)}" AND '
+            f'{self._filtre_territoire(departement_code, region_code)} AND '
+            f'year(annee) >= {year} AND '
+            f'year(annee) <= {year}'
+        )
+
+        return self._requete(
+            "prescriptions",
+            {
+                "select": "annee, profession_sante,libelle_poste_prescription,montant_total_prescription_integer,montant_moyen_prescription_integer",
+                "where": where,
+                "limit": 100,
+                "order_by": "annee",
+            },
+        )
