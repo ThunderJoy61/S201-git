@@ -273,13 +273,13 @@ main.container {
 
 .hero-badge {
     display: inline-block;
-    background: rgba(255, 255, 255, 0.16);
+    background: var(--blue);
     color: white;
     padding: 8px 13px;
     border-radius: 999px;
     font-size: 0.9rem;
     font-weight: 800;
-    margin-bottom: 18px;
+    margin-top: 18px;
 }
 
 .home-hero h1 {
