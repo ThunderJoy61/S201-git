@@ -33,7 +33,9 @@
             <select name="prescription_id" id="prescriptions" required>
                 <option value="">-- Choisir un type de prescription --</option>
                 {% for p in prescriptionsliste %}
-                    <option value="{{ p.id }}">{{ p.libelle[0]|upper }}{{ p.libelle[1:] }}</option>
+                    <option value="{{ p.id }}" {% if prescriptions and prescriptions.id == p.id %}selected{% endif %}>
+                        {{ p.libelle[0]|upper }}{{ p.libelle[1:] }}
+                    </option>
                 {% endfor %}
             </select>
         </div>
@@ -47,6 +49,7 @@
                         value="{{ r.id }}"
                         data-code="{{ r.code }}"
                         data-libelle="{{ r.libelle }}"
+                        {% if region and region.id == r.id %}selected{% endif %}
                     >
                         {{ r.libelle }}
                     </option>
@@ -65,7 +68,9 @@
             <label for="first_year">Année</label>
             <select name="year" id="year" required>
                 {% for a in range(2010, 2025) %}
-                    <option value="{{ a }}" {% if a == 2024 %}selected{% endif %}>{{ a }}</option>
+                    <option value="{{ a }}" {% if year == a or (not year and a == 2024) %}selected{% endif %}>
+                        {{ a }}
+                    </option>
                 {% endfor %}
             </select>
         </div>
