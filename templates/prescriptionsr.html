@@ -8,7 +8,7 @@
 <section class="hero">
     <div>
         <span class="hero-badge">Résultats d’analyse</span>
-        <h2>{{ prescriptions.libelle|capitalize }}</h2>
+        <h2>{{ prescriptions.libelle[0]|upper }}{{ prescriptions.libelle[1:] }}</h2>
         <p>
             Territoire sélectionné :
             <strong>{{ territoire_label }}</strong>
@@ -29,6 +29,27 @@
 </section>
 
 {% if resultats %}
+<section class="kpi-grid">
+    <div class="kpi-card">
+        <span class="kpi-label">Année</span>
+        <strong>{{ year }}</strong>
+    </div>
+
+    <div class="kpi-card">
+        <span class="kpi-label">Montant total global</span>
+        <strong>{{ "{:,}".format(montant_total_global|int).replace(",", " ") }} €</strong>
+    </div>
+
+    <div class="kpi-card">
+        <span class="kpi-label">Moyenne des montants moyen</span>
+        <strong>{{ "{:,}".format(montant_moyen_global|int).replace(",", " ") }} €</strong>
+    </div>
+
+    <div class="kpi-card">
+        <span class="kpi-label">Territoire</span>
+        <strong>{{ territoire_label }}</strong>
+    </div>
+</section>
 {% endif %}
 
 <section class="card">
@@ -57,10 +78,10 @@
                     {% for r in resultats %}
                         <tr>
                             <td>{{ r.annee|string|truncate(10, True, '') }}</td>
-                            <td>{{ r.profession_sante|capitalize }}</td>
+                            <td>{{ r.profession_sante }}</td>
                             <td>{{ r.libelle_poste_prescription[0]|upper }}{{ r.libelle_poste_prescription[1:] }}</td>
-                            <td> {{ r.montant_total_prescription_integer }}</td>
-                            <td>{{ r.montant_moyen_prescription_integer }}</td>
+                            <td>{{ "{:,}".format(r.montant_total_prescription_integer|int).replace(",", " ") }} €</td>
+                            <td>{{ "{:,}".format(r.montant_moyen_prescription_integer|int).replace(",", " ") }} €</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -90,4 +111,82 @@
         </div>
     {% endif %}
 </section>
+<section class="card">
+    <div class="section-title">
+        <div>
+            <h3>Montants totaux au poste {{ prescriptions.libelle[0]|upper }}{{ prescriptions.libelle[1:] }} en {{ year }}</h3>
+            <p>
+                Ce graphique montre les montants totaux des prescriptions pour le poste sélectionné sur l’année choisie.
+            </p>
+        </div>
+    </div>
+    <div style="max-width: 1100px; height: 450px; margin: 30px auto;">
+        <canvas id="graphiqueHorizontal"></canvas>
+    </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const labelsPrescriptions = [{% for r in resultats %}"{{ r.profession_sante[0]|upper }}{{ r.profession_sante[1:] }}",{% endfor %}];
+        
+        const montantsTotaux = [{% for r in resultats %}{{ r.montant_total_prescription_integer or 0 }},{% endfor %}];
+
+        const ctx = document.getElementById('graphiqueHorizontal').getContext('2d');
+        
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labelsPrescriptions,
+                datasets: [{
+                    label: 'Montant Total (€)',
+                    data: montantsTotaux,
+                    backgroundColor: '#0057A4',
+                    borderColor: '#0057A4',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        type: 'logarithmic',
+                        beginAtZero: true,
+                        ticks: {
+                            autoSkip: true,
+                            maxTicksLimit: 15,
+                            maxrotation: 0,
+                            minrotation: 0,
+                            callback: function(value) {
+                                if (value >= 1000000) return (value / 1000000).toFixed(1) + ' M€';
+                                if (value >= 1000) return (value / 1000).toFixed(0) + ' K€';
+                                return value + ' €';
+                            }
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            autoSkip: false,
+                            font: { size: 10 },
+                            callback: function(value) {
+                                const label = this.getLabelForValue(value);
+                            if (label.length > 25) {
+                                return label.substring(0, 25) + '...';
+                            }
+                            return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}

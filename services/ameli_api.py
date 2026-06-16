@@ -140,6 +140,6 @@ class AmeliAPI:
                 "select": "annee, profession_sante,libelle_poste_prescription,montant_total_prescription_integer,montant_moyen_prescription_integer",
                 "where": where,
                 "limit": 100,
-                "order_by": "annee",
+                "order_by": "montant_total_prescription_integer DESC",
             },
         )

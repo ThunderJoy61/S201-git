@@ -86,6 +86,32 @@ def resultats():
             territoire_label = f"{dept.code} - {dept.libelle}"
             resultats = api.get_prescriptions(type_prescription=prescriptions.libelle, departement_code=dept.code, year=year, region_code=region.code)
 
+        resultats_filtres = []
+
+        if resultats:
+            for r in resultats:
+                prof = r.get('profession_sante', '').lower() if isinstance(r, dict) else getattr(r, 'profession_sante', '').lower()
+                if "ensemble" not in prof:
+                    resultats_filtres.append(r)
+
+        resultats_f = sorted(
+            resultats_filtres,
+            key=lambda x: (x.get('montant_total_prescription_integer') or 0) if isinstance(x, dict) else (getattr(x, 'montant_total_prescription_integer', 0) or 0),
+            reverse=True
+        )
+
+        montant_total_global = sum(
+            ((r.get('montant_total_prescription_integer') or 0) if isinstance(r, dict) else (getattr(r, 'montant_total_prescription_integer', 0) or 0))
+            for r in resultats_filtres
+        )
+
+        somme_des_moyens = sum(
+            ((r.get('montant_moyen_prescription_integer') or 0) if isinstance(r, dict) else (getattr(r, 'montant_moyen_prescription_integer', 0) or 0))
+            for r in resultats_filtres
+        )
+
+        montant_moyen_global = int(somme_des_moyens / len(resultats_filtres)) if len(resultats_filtres) > 0 else 0
+
         return render_template(
             "prescriptionsr.html",
             prescriptions=prescriptions,
@@ -93,7 +119,9 @@ def resultats():
             region=region,
             territoire_label=territoire_label,
             year=year,
-            resultats=resultats,
+            resultats=resultats_f,
+            montant_total_global=montant_total_global,
+            montant_moyen_global=montant_moyen_global,
             api_error=api.last_error,
         )
     finally:
