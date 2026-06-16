@@ -83,6 +83,39 @@
 <script src="{{ url_for('static', filename='js/cascade.js') }}"></script>
 
 {% if has_searched %}
+    <section class="card">
+        <div class="section-title">
+            <div>
+                <span class="mini-label">Sélection</span>
+                <h2>Résumé de la recherche</h2>
+                <p>
+                    Type de prescription :
+                    <strong>
+                        {{ prescriptions.libelle[0]|upper }}{{ prescriptions.libelle[1:] }}
+                    </strong>
+                    {% if dept %}
+                        <br>
+                        Région :
+                        <strong>{{ region.libelle }}</strong>
+                        <br>
+                        Département :
+                        <strong>{{ territoire_label }}</strong>
+                    {% elif region.libelle == "FRANCE" %}
+                        <br>
+                        Territoire :
+                        <strong>France</strong>
+                    {% elif region %}
+                        <br>
+                        Région :
+                        <strong>{{ region.libelle }}</strong>
+                    {% endif %}
+                    <br>
+                    Année :
+                    <strong>{{ year }}</strong>
+                </p>
+            </div>
+        </div>
+    </section>
     <section class="kpi-grid">
         <div class="kpi-card">
             <span class="kpi-label">Année</span>
@@ -99,10 +132,17 @@
             <strong>{{ "{:,}".format(montant_moyen_global|int).replace(",", " ") }} €</strong>
         </div>
 
-        <div class="kpi-card">
-            <span class="kpi-label">Territoire</span>
-            <strong>{{ territoire_label }}</strong>
-        </div>
+        {% if territoire_label == "FRANCE" %}
+            <div class="kpi-card">
+                <span class="kpi-label">Territoire</span>
+                <strong>France</strong>
+            </div>
+        {% else %}
+            <div class="kpi-card">
+                <span class="kpi-label">Territoire</span>
+                <strong>{{ territoire_label }}</strong>
+            </div>
+        {% endif %}
     </section>
 
     {% if resultats %}
