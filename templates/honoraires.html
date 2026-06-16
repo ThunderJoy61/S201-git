@@ -3,25 +3,44 @@
 {% block titre %}Honoraires / DataLynx{% endblock %}
 
 {% block contenu %}
+<section class="hero">
+    <div>
+        <span class="hero-badge">Honoraires · Data Ameli</span>
+        <h2>Consulter les honoraires</h2>
+        <p>
+            Analysez les montants d’honoraires par catégorie, territoire et période.
+            Les données sont récupérées depuis l’API Data Ameli.
+        </p>
+    </div>
+</section>
+
 <section class="card form-card" id="analyse">
     <div class="section-title">
         <div>
-            <span class="mini-label">Analyse principale</span>
-            <h2>Consulter les honoraires</h2>
+            <span class="mini-label">Filtre d’analyse</span>
+            <h2>Choisir les critères</h2>
             <p>
-                Remplissez le formulaire pour interroger l’API Data Ameli et afficher
-                les données correspondant à votre sélection.
+                Sélectionnez un type d’honoraire, un territoire et une période.
+                Les résultats seront affichés sous forme de KPI, tableau et graphique.
             </p>
         </div>
     </div>
 
-    <form action="{{ url_for('effectifs.afficher') }}" method="get" class="form-grid">
+    <form action="{{ url_for('honoraires.index') }}" method="get" class="form-grid">
         <div class="form-field">
             <label for="honoraires">Types d'honoraires</label>
             <select name="honoraires_id" id="honoraires" required>
                 <option value="">-- Choisir un type d'honoraire --</option>
+
                 {% for h in honoraires %}
-                    <option value="{{ h.id }}">{{ h.libelle }}</option>
+                    <option
+                        value="{{ h.id }}"
+                        {% if selected_honoraires_id == h.id %}selected{% endif %}
+                    >
+                        {{ h.niveau_1 }}
+                        {% if h.niveau_2 %} / {{ h.niveau_2 }}{% endif %}
+                        {% if h.niveau_3 %} / {{ h.niveau_3 }}{% endif %}
+                    </option>
                 {% endfor %}
             </select>
         </div>
@@ -35,6 +54,7 @@
                         value="{{ r.id }}"
                         data-code="{{ r.code }}"
                         data-libelle="{{ r.libelle }}"
+                        {% if selected_region_id == r.id %}selected{% endif %}
                     >
                         {{ r.libelle }}
                     </option>
@@ -46,24 +66,40 @@
             <label for="departement">Département</label>
             <select name="departement_id" id="departement" required>
                 <option value="">-- Choisir une région d’abord --</option>
+
+                {% if departement_selectionne %}
+                    <option value="{{ departement_selectionne.id }}" selected>
+                        {{ departement_selectionne.code }} — {{ departement_selectionne.libelle }}
+                    </option>
+                {% endif %}
             </select>
         </div>
 
         <div class="container-annee">
             <div class="form-field annee">
                 <label for="first_year">Année de début</label>
-                <select name="first_year" id="first_year" required onchange="document.querySelectorAll('#last_year option').forEach(o => o.hidden = o.value < this.value)">
+                <select
+                    name="first_year"
+                    id="first_year"
+                    required
+                    onchange="document.querySelectorAll('#last_year option').forEach(o => o.hidden = o.value < this.value)"
+                >
                     {% for a in range(2010, 2025) %}
-                        <option value="{{ a }}" {% if a == 2010 %}selected{% endif %}>{{ a }}</option>
+                        <option value="{{ a }}" {% if first_year == a %}selected{% endif %}>{{ a }}</option>
                     {% endfor %}
                 </select>
             </div>
 
             <div class="form-field annee">
                 <label for="last_year">Année de fin</label>
-                <select name="last_year" id="last_year" required onchange="document.querySelectorAll('#first_year option').forEach(o => o.hidden = o.value > this.value)">
+                <select
+                    name="last_year"
+                    id="last_year"
+                    required
+                    onchange="document.querySelectorAll('#first_year option').forEach(o => o.hidden = o.value > this.value)"
+                >
                     {% for a in range(2024, 2009, -1) %}
-                        <option value="{{ a }}" {% if a == 2024 %}selected{% endif %}>{{ a }}</option>
+                        <option value="{{ a }}" {% if last_year == a %}selected{% endif %}>{{ a }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -72,6 +108,210 @@
         <button type="submit">Afficher les résultats</button>
     </form>
 </section>
+
+{% if recherche_lancee %}
+<section class="card">
+    <div class="section-title">
+        <div>
+            <span class="mini-label">Sélection</span>
+            <h2>Résumé de la recherche</h2>
+            <p>
+                Type d’honoraire :
+                <strong>
+                    {{ honoraire_selectionne.niveau_1 }}
+                    {% if honoraire_selectionne.niveau_2 %} / {{ honoraire_selectionne.niveau_2 }}{% endif %}
+                    {% if honoraire_selectionne.niveau_3 %} / {{ honoraire_selectionne.niveau_3 }}{% endif %}
+                </strong>
+                <br>
+                Territoire :
+                <strong>{{ territoire_label }}</strong>
+                <br>
+                Période :
+                <strong>{{ first_year }} → {{ last_year }}</strong>
+            </p>
+        </div>
+    </div>
+</section>
+
+{% if api_error %}
+<section class="card">
+    <div class="empty-state">
+        <h3>Erreur API</h3>
+        <p>{{ api_error }}</p>
+    </div>
+</section>
+{% endif %}
+
+{% if resultats %}
+<section class="kpi-grid">
+    <div class="kpi-card">
+        <span class="kpi-label">Lignes trouvées</span>
+        <strong>{{ resultats|length }}</strong>
+    </div>
+
+    <div class="kpi-card">
+        <span class="kpi-label">Première année</span>
+        <strong>
+            {% if evolution_honoraires %}
+                {{ evolution_honoraires[0].annee }}
+            {% else %}
+                {{ first_year }}
+            {% endif %}
+        </strong>
+    </div>
+
+    <div class="kpi-card">
+        <span class="kpi-label">Dernière année</span>
+        <strong>
+            {% if evolution_honoraires %}
+                {{ evolution_honoraires[-1].annee }}
+            {% else %}
+                {{ last_year }}
+            {% endif %}
+        </strong>
+    </div>
+
+    <div class="kpi-card">
+        <span class="kpi-label">Source</span>
+        <strong>Data Ameli</strong>
+    </div>
+</section>
+
+<section class="card">
+    <div class="section-title">
+        <div>
+            <span class="mini-label">Visualisation</span>
+            <h2>Évolution du montant total</h2>
+            <p>
+                Le graphique additionne les montants d’honoraires disponibles par année.
+            </p>
+        </div>
+    </div>
+
+    <canvas id="honorairesChart"></canvas>
+    <p id="honorairesChartEmpty" class="empty-state" hidden>
+        Aucun montant positif exploitable pour le graphique.
+    </p>
+</section>
+
+<section class="card">
+    <div class="section-title">
+        <div>
+            <span class="mini-label">Résultats détaillés</span>
+            <h2>Tableau des honoraires</h2>
+            <p>
+                Les valeurs “NS” ou “NC” peuvent apparaître lorsque l’API applique le secret statistique
+                ou lorsqu’une donnée n’est pas calculable.
+            </p>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Année</th>
+                    <th>Profession</th>
+                    <th>Niveau 1</th>
+                    <th>Niveau 2</th>
+                    <th>Niveau 3</th>
+                    <th>Montant total</th>
+                    <th>Montant moyen</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for r in resultats %}
+                    <tr>
+                        <td>{{ r.annee|string|truncate(10, True, '') }}</td>
+                        <td>{{ r.profession_sante }}</td>
+                        <td>{{ r.niveau_1 }}</td>
+                        <td>{{ r.niveau_2 if r.niveau_2 else "—" }}</td>
+                        <td>{{ r.niveau_3 if r.niveau_3 else "—" }}</td>
+                        <td>{{ r.montant_honoraires }}</td>
+                        <td>{{ r.montant_honoraires_moyens }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% else %}
+<section class="card">
+    <div class="empty-state">
+        <h3>Aucune donnée disponible</h3>
+        <p>
+            L’API n’a retourné aucun honoraire pour cette sélection.
+            Essayez un autre type d’honoraire, une autre période ou un autre territoire.
+        </p>
+    </div>
+</section>
+{% endif %}
+{% endif %}
+
+{% if resultats %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const evolutionHonoraires = {{ evolution_honoraires|tojson }};
+
+    const montantsParAnnee = {};
+
+    for (const ligne of evolutionHonoraires) {
+        const anneeTrouvee = String(ligne.annee || "").match(/\d{4}/);
+        const valeurBrute = ligne.montant_honoraires;
+
+        if (!anneeTrouvee || valeurBrute === null || valeurBrute === "") {
+            continue;
+        }
+
+        const annee = anneeTrouvee[0];
+        const montant = Number(valeurBrute);
+
+        if (Number.isFinite(montant) && montant >= 0) {
+            montantsParAnnee[annee] = (montantsParAnnee[annee] || 0) + montant;
+        }
+    }
+
+    const labelsHonoraires = Object.keys(montantsParAnnee).sort((a, b) => Number(a) - Number(b));
+    const dataHonoraires = labelsHonoraires.map(annee => montantsParAnnee[annee]);
+    const canvasHonoraires = document.getElementById("honorairesChart");
+    const messageHonorairesVide = document.getElementById("honorairesChartEmpty");
+
+    if (!labelsHonoraires.length) {
+        canvasHonoraires.hidden = true;
+        messageHonorairesVide.hidden = false;
+    } else {
+        new Chart(canvasHonoraires, {
+            type: "line",
+            data: {
+                labels: labelsHonoraires,
+                datasets: [{
+                    label: "Montant total des honoraires",
+                    data: dataHonoraires,
+                    tension: 0.35,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => Number(value).toLocaleString("fr-FR")
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endif %}
 
 <script src="{{ url_for('static', filename='js/cascade.js') }}"></script>
 {% endblock %}
