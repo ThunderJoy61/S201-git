@@ -33,7 +33,9 @@
         {% if preview_item %}
             <div class="preview-kpi-grid">
                 <div class="preview-kpi-card">
-                    <span class="preview-kpi-label">Effectif {{ preview_item.annee|string|truncate(4, True, '') }}</span>
+                    <span class="preview-kpi-label">
+                        Effectif {{ preview_item.annee|string|truncate(4, True, '') }}
+                    </span>
                     <strong>{{ preview_item.effectif }}</strong>
                 </div>
 
@@ -115,6 +117,34 @@
     </article>
 </section>
 
+<section class="section-grid two-cols">
+    <article class="card">
+        <span class="mini-label">Fonctionnalités</span>
+        <h3>Ce que permet DataLynx</h3>
+        <ul class="feature-list">
+            <li>Consulter les effectifs d’une profession de santé par territoire.</li>
+            <li>Observer l’évolution des données sur plusieurs années.</li>
+            <li>Lire les résultats sous forme de tableau et de graphique.</li>
+            <li>Accéder à un tableau de bord avec indicateurs clés.</li>
+            <li>Préparer des comparaisons entre territoires.</li>
+        </ul>
+    </article>
+
+    <article class="card">
+        <span class="mini-label">Méthodologie</span>
+        <h3>Source et fonctionnement</h3>
+        <p>
+            Les listes de régions, départements et professions proviennent de la base
+            MySQL construite en SAE 2.04. Les valeurs chiffrées sont ensuite récupérées
+            dynamiquement depuis l’API publique Data Ameli.
+        </p>
+        <p>
+            Cette séparation permet d’avoir une interface rapide tout en affichant
+            des données actualisées depuis la source officielle.
+        </p>
+    </article>
+</section>
+
 <section class="card form-card" id="analyse">
     <div class="section-title">
         <div>
@@ -164,7 +194,12 @@
         <div class="container-annee">
             <div class="form-field annee">
                 <label for="first_year">Année de début</label>
-                <select name="first_year" id="first_year" required onchange="document.querySelectorAll('#last_year option').forEach(o => o.hidden = o.value < this.value)">
+                <select
+                    name="first_year"
+                    id="first_year"
+                    required
+                    onchange="document.querySelectorAll('#last_year option').forEach(o => o.hidden = o.value < this.value)"
+                >
                     {% for a in range(2010, 2025) %}
                         <option value="{{ a }}" {% if a == 2010 %}selected{% endif %}>{{ a }}</option>
                     {% endfor %}
@@ -173,7 +208,12 @@
 
             <div class="form-field annee">
                 <label for="last_year">Année de fin</label>
-                <select name="last_year" id="last_year" required onchange="document.querySelectorAll('#first_year option').forEach(o => o.hidden = o.value > this.value)">
+                <select
+                    name="last_year"
+                    id="last_year"
+                    required
+                    onchange="document.querySelectorAll('#first_year option').forEach(o => o.hidden = o.value > this.value)"
+                >
                     {% for a in range(2024, 2009, -1) %}
                         <option value="{{ a }}" {% if a == 2024 %}selected{% endif %}>{{ a }}</option>
                     {% endfor %}
