@@ -184,4 +184,114 @@
     });
 </script>
 {% endif %}
+
+<section class="card">
+    <div class="section-title">
+        <div>
+            <h3>Filtre d'analyse</h3>
+            <p>Sélectionnez l'année à afficher pour les répartitions démographiques.</p>
+        </div>
+    </div>
+    <form action="{{ url_for('effectifs.afficher') }}#bloc-diagrammes" method="get" class="form-grid">
+        <input type="hidden" name="profession_id" value="{{ prof.id if prof else '' }}">
+        <input type="hidden" name="region_id" value="{{ region.id if region else '' }}">
+        <input type="hidden" name="departement_id" value="{{ dept.id if dept else 'all' }}">
+        <input type="hidden" name="first_year" value="{{ first_year }}">
+        <input type="hidden" name="last_year" value="{{ last_year }}">
+
+        <div class="form-field annee" >
+            <label for="year">Année</label>
+            <select name="year" id="year" required>
+                {% for a in range(2024, 2009, -1) %}
+                    <option value="{{ a }}" {% if year == a or (not year and a == 2024) %}selected{% endif %}>
+                        {{ a }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit">Afficher les résultats</button>
+    </form>
+</section>
+
+<div id="bloc-diagrammes" style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+
+    {% if sexe and age %}
+        <section class="card" style="flex: 1; min-width: 550px; max-width: 100%;">
+            <div class="section-title">
+                <div>
+                    <h3>Répartition par Sexe</h3>
+                    <p>Ce diagramme compare la répartition des sexes parmi les {{prof.libelle}}</p>
+                </div>
+            </div>
+            <div>
+                <canvas id="graphiqueSexe"></canvas>
+            </div>
+        </section>
+
+        <section class="card" style="flex: 1; min-width: 550px; max-width: 100%;">
+            <div class="section-title">
+                <div>
+                    <h3>Répartition par Tranche d'âge</h3>
+                    <p>Ce diagramme compare les tranches d'âges parmi les {{prof.libelle}}</p>
+                </div>
+            </div>
+            <div>
+                <canvas id="graphiqueAge"></canvas>
+            </div>
+        </section>
+    {% else %}
+        <section class="card" style="flex: 1; width: 100%;">
+            <div class="empty-state">
+                <p>Aucun diagramme disponible pour cette sélection.</p>
+            </div>
+        </section>
+    {% endif %}
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+const ctxSexe = document.getElementById("graphiqueSexe");
+const ctxAge = document.getElementById("graphiqueAge");
+
+if (ctxSexe && ctxAge) {
+    new Chart(ctxSexe, {
+        type: "doughnut",
+        data: {
+            labels: {{ sexe_labels|tojson }},
+            datasets: [{
+                data: {{ sexe_data|tojson }},
+                backgroundColor: ["pink", "lightblue", "red", "black"],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: "bottom" } }
+        }
+    });
+
+    new Chart(ctxAge, {
+        type: "doughnut",
+        data: {
+            labels: {{ age_labels|tojson }},
+            datasets: [{
+                data: {{ age_data|tojson }},
+                backgroundColor: ["#2a9d8f", "#e76f51", "#f4a261", 
+                                  "#e9c46a", "#264653", "#457b9d", 
+                                  "#1d3557", "#a8dadc", "#e63946", 
+                                  "#8338ec", "#ff006e", "#3a86ff", 
+                                  "#ffbe0b"
+                                 ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: "bottom" } }
+        }
+    });
+}
+</script>
 {% endblock %}
