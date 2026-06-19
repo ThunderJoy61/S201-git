@@ -5,7 +5,7 @@
 {% block contenu %}
 <section class="hero">
     <div>
-        <span class="hero-badge">Résultats d’analyse</span>
+        <span class="hero-badge">Effectifs · Data Ameli</span>
         <h2>{{ prof.libelle }}</h2>
         <p>
             Territoire sélectionné :
@@ -23,7 +23,7 @@
 </section>
 
 <section class="actions-row">
-    <a href="{{ url_for('accueil.index') }}" class="btn-link secondary-btn">
+    <a href="{{ url_for('accueil.index') }}#analyse" class="btn-link secondary-btn">
         Nouvelle recherche
     </a>
 

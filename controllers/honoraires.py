@@ -107,7 +107,7 @@ def index():
 
         elif departement_selectionne:
             departement_code = departement_selectionne.code
-            territoire_label = f"{departement_selectionne.code} — {departement_selectionne.libelle}"
+            territoire_label = f"{departement_selectionne.code} - {departement_selectionne.libelle}"
 
         else:
             departement_code = None
@@ -129,7 +129,6 @@ def index():
                 message_erreur = "Le département choisi ne correspond pas à la région."
 
             else:
-                # Résultats du tableau : respecte la plage choisie par l'utilisateur
                 resultats = api.get_honoraires(
                     honoraire_selectionne,
                     departement_code,
@@ -138,7 +137,6 @@ def index():
                     region_selectionnee.code
                 )
 
-                # Graphique : toujours sur 2010 -> 2024
                 evolution_honoraires = api.get_evolution_honoraires(
                     honoraire_selectionne,
                     departement_code,

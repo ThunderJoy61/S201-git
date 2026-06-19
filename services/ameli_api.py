@@ -95,7 +95,7 @@ class AmeliAPI:
                     "select": select,
                     "where": where,
                     "limit": 100,
-                    "order_by": "annee,profession_sante",
+                    "order_by": "montant_honoraires DESC",
                 },
                 normalisateur=self._normaliser_honoraires
             )

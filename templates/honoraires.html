@@ -123,37 +123,34 @@
 
 {% if resultats %}
 <section class="kpi-grid">
+
+    <div class="kpi-card">
+        <span class="kpi-label">Année</span>
+        <strong>{{ year }}</strong>
+    </div>
+    
     <div class="kpi-card">
         <span class="kpi-label">Lignes trouvées</span>
         <strong>{{ resultats|length }}</strong>
     </div>
 
     <div class="kpi-card">
-        <span class="kpi-label">Année</span>
-        <strong>{{ year }}</strong>
-    </div>
-
-    <div class="kpi-card">
         <span class="kpi-label">Source</span>
         <strong>Data Ameli</strong>
     </div>
-</section>
 
-<section class="card">
-    <div class="section-title">
-        <div>
-            <span class="mini-label">Visualisation</span>
-            <h2>Évolution du montant total</h2>
-            <p>
-                Le graphique additionne les montants d’honoraires disponibles par année.
-            </p>
+    {% if territoire_label == "FRANCE" %}
+        <div class="kpi-card">
+            <span class="kpi-label">Territoire</span>
+            <strong>France entière</strong>
         </div>
-    </div>
+    {% else %}
+        <div class="kpi-card">
+            <span class="kpi-label">Territoire</span>
+            <strong>{{ territoire_label }}</strong>
+        </div>
+    {% endif %}
 
-    <canvas id="honorairesChart"></canvas>
-    <p id="honorairesChartEmpty" class="empty-state" hidden>
-        Aucun montant positif exploitable pour le graphique.
-    </p>
 </section>
 
 <section class="card">
@@ -177,8 +174,8 @@
                     <th>Niveau 1</th>
                     <th>Niveau 2</th>
                     <th>Niveau 3</th>
-                    <th>Montant total</th>
-                    <th>Montant moyen</th>
+                    <th>Montant total (en €)</th>
+                    <th>Montant moyen (en €)</th>
                 </tr>
             </thead>
 
@@ -190,14 +187,32 @@
                         <td>{{ r.niveau_1 }}</td>
                         <td>{{ r.niveau_2 if r.niveau_2 else "—" }}</td>
                         <td>{{ r.niveau_3 if r.niveau_3 else "—" }}</td>
-                        <td>{{ "{:,}".format(r.montant_honoraires|int).replace(",", " ") }}</td>
-                        <td>{{ "{:,}".format(r.montant_honoraires_moyens|int).replace(",", " ") }}</td>
+                        <td>{{ "{:,}".format(r.montant_honoraires|int).replace(",", " ") }} €</td>
+                        <td>{{ "{:,}".format(r.montant_honoraires_moyens|int).replace(",", " ") }} €</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </section>
+
+<section class="card">
+    <div class="section-title">
+        <div>
+            <span class="mini-label">Visualisation</span>
+            <h2>Évolution du montant total</h2>
+            <p>
+                Le graphique additionne les montants d’honoraires disponibles par année.
+            </p>
+        </div>
+    </div>
+
+    <canvas id="honorairesChart"></canvas>
+    <p id="honorairesChartEmpty" class="empty-state" hidden>
+        Aucun montant positif exploitable pour le graphique.
+    </p>
+</section>
+
 {% else %}
 <section class="card">
     <div class="empty-state">
@@ -263,7 +278,7 @@
                 responsive: true,
                 plugins: {
                     legend: {
-                        display: true
+                        display: false
                     }
                 },
                 scales: {
