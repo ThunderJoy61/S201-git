@@ -1,0 +1,455 @@
+{% extends "base.html" %}
+
+{% block titre %}Comparaison / DataLynx{% endblock %}
+
+{% block contenu %}
+<section class="hero comparison-hero">
+    <div>
+        <span class="hero-badge">Comparaison - Data Ameli</span>
+        <h2>Comparer deux territoires</h2>
+        <p>
+            Analysez les effectifs et densites d'une profession de sante sur deux
+            territoires, puis visualisez les ecarts annee par annee.
+        </p>
+    </div>
+</section>
+
+<section class="card form-card" id="analyse">
+    <div class="section-title">
+        <div>
+            <span class="mini-label">Filtres de comparaison</span>
+            <h2>Choisir la profession, les territoires et la periode</h2>
+            <p>
+                Chaque territoire peut etre la France entiere, une region complete
+                ou un departement.
+            </p>
+        </div>
+    </div>
+
+    <form action="{{ url_for('comparaison.index') }}" method="get" class="comparison-form">
+        <div class="form-field comparison-full">
+            <label for="profession">Profession de sante</label>
+            <select name="profession_id" id="profession" required>
+                <option value="">-- Choisir une profession --</option>
+                {% for p in professions %}
+                    <option value="{{ p.id }}" {% if selected_profession_id == p.id %}selected{% endif %}>
+                        {{ p.libelle }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <fieldset class="comparison-fieldset">
+            <legend>Territoire A</legend>
+
+            <div class="form-field">
+                <label for="region_a">Region</label>
+                <select name="region_a_id" id="region_a" data-departement-target="departement_a" required>
+                    <option value="">-- Choisir une region --</option>
+                    {% for r in regions %}
+                        <option
+                            value="{{ r.id }}"
+                            data-code="{{ r.code }}"
+                            data-libelle="{{ r.libelle }}"
+                            {% if selected_region_a_id == r.id %}selected{% endif %}
+                        >
+                            {{ r.libelle }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-field">
+                <label for="departement_a">Departement</label>
+                <select name="departement_a_id" id="departement_a" data-selected="{{ selected_departement_a_id or '' }}" required>
+                    <option value="">-- Choisir une region d'abord --</option>
+                </select>
+            </div>
+        </fieldset>
+
+        <fieldset class="comparison-fieldset">
+            <legend>Territoire B</legend>
+
+            <div class="form-field">
+                <label for="region_b">Region</label>
+                <select name="region_b_id" id="region_b" data-departement-target="departement_b" required>
+                    <option value="">-- Choisir une region --</option>
+                    {% for r in regions %}
+                        <option
+                            value="{{ r.id }}"
+                            data-code="{{ r.code }}"
+                            data-libelle="{{ r.libelle }}"
+                            {% if selected_region_b_id == r.id %}selected{% endif %}
+                        >
+                            {{ r.libelle }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-field">
+                <label for="departement_b">Departement</label>
+                <select name="departement_b_id" id="departement_b" data-selected="{{ selected_departement_b_id or '' }}" required>
+                    <option value="">-- Choisir une region d'abord --</option>
+                </select>
+            </div>
+        </fieldset>
+
+        <div class="container-annee comparison-full">
+            <div class="form-field annee">
+                <label for="first_year">Annee de debut</label>
+                <select name="first_year" id="first_year" required>
+                    {% for a in range(2010, 2025) %}
+                        <option value="{{ a }}" {% if first_year == a %}selected{% endif %}>{{ a }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-field annee">
+                <label for="last_year">Annee de fin</label>
+                <select name="last_year" id="last_year" required>
+                    {% for a in range(2024, 2009, -1) %}
+                        <option value="{{ a }}" {% if last_year == a %}selected{% endif %}>{{ a }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <button type="submit" class="comparison-full">Comparer les territoires</button>
+    </form>
+</section>
+
+{% if comparaison_lancee %}
+    {% if message_erreur %}
+        <section class="card">
+            <div class="empty-state">
+                <h3>Comparaison impossible</h3>
+                <p>{{ message_erreur }}</p>
+            </div>
+        </section>
+    {% endif %}
+
+    {% if has_donnees %}
+        <section class="card comparison-summary">
+            <div class="section-title">
+                <div>
+                    <span class="mini-label">Selection</span>
+                    <h2>{{ profession.libelle }}</h2>
+                    <p>
+                        <strong>{{ label_a }}</strong> compare a <strong>{{ label_b }}</strong>,
+                        de {{ first_year }} a {{ last_year }}.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="kpi-grid">
+            <div class="kpi-card">
+                <span class="kpi-label">Derniere annee commune</span>
+                <strong>
+                    {% if dernier_a and dernier_b %}
+                        {{ dernier_a.annee|string|truncate(4, True, '') }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="kpi-card">
+                <span class="kpi-label">Effectif {{ label_a }}</span>
+                <strong>{{ "{:,}".format(dernier_a.effectif|int).replace(",", " ") if dernier_a else "-" }}</strong>
+            </div>
+
+            <div class="kpi-card">
+                <span class="kpi-label">Effectif {{ label_b }}</span>
+                <strong>{{ "{:,}".format(dernier_b.effectif|int).replace(",", " ") if dernier_b else "-" }}</strong>
+            </div>
+
+            <div class="kpi-card">
+                <span class="kpi-label">Ecart d'effectif</span>
+                <strong>
+                    {% if ecart_effectif is not none %}
+                        {{ "{:+,}".format(ecart_effectif|int).replace(",", " ") }}
+                        {% if ecart_effectif_pourcentage is not none %}
+                            ({{ "{:+.1f}".format(ecart_effectif_pourcentage).replace(".0", "") }} %)
+                        {% endif %}
+                    {% else %}
+                        -
+                    {% endif %}
+                </strong>
+            </div>
+        </section>
+
+        <section class="section-grid two-cols comparison-kpis">
+            <article class="card">
+                <span class="mini-label">Densite</span>
+                <h3>{{ label_a }}</h3>
+                <p class="comparison-value">{{ dernier_a.densite if dernier_a else "-" }}</p>
+            </article>
+
+            <article class="card">
+                <span class="mini-label">Densite</span>
+                <h3>{{ label_b }}</h3>
+                <p class="comparison-value">{{ dernier_b.densite if dernier_b else "-" }}</p>
+            </article>
+        </section>
+
+        <section class="card comparison-density-gap">
+            <span class="mini-label">Ecart de densite</span>
+            <h3>Difference entre {{ label_a }} et {{ label_b }}</h3>
+            <p class="comparison-value">
+                {% if ecart_densite is not none %}
+                    {{ "{:+.2f}".format(ecart_densite) }}
+                    {% if ecart_densite_pourcentage is not none %}
+                        ({{ "{:+.1f}".format(ecart_densite_pourcentage).replace(".0", "") }} %)
+                    {% endif %}
+                {% else %}
+                    -
+                {% endif %}
+            </p>
+        </section>
+
+        <section class="card">
+            <div class="section-title">
+                <div>
+                    <span class="mini-label">Visualisation</span>
+                    <h2>Evolution des effectifs</h2>
+                    <p>
+                        Les courbes affichent l'evolution de la profession choisie
+                        sur les deux territoires selectionnes.
+                    </p>
+                </div>
+            </div>
+
+            <canvas id="comparisonChart"></canvas>
+        </section>
+
+        {% if dernier_a and dernier_b %}
+            <section class="card">
+                <div class="section-title">
+                    <div>
+                        <span class="mini-label">Proportion</span>
+                        <h2>Repartition entre les deux territoires</h2>
+                        <p>
+                            Le camembert compare la part de chaque territoire dans
+                            l'effectif total observe sur la derniere annee disponible.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="comparison-pie-wrap">
+                    <canvas id="comparisonPieChart"></canvas>
+                </div>
+            </section>
+        {% endif %}
+
+        <section class="card">
+            <div class="section-title">
+                <div>
+                    <span class="mini-label">Resultats detailles</span>
+                    <h2>Tableau comparatif</h2>
+                    <p>
+                        Les ecarts sont calcules par soustraction: territoire A moins
+                        territoire B.
+                    </p>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Annee</th>
+                            <th>Effectif A</th>
+                            <th>Densite A</th>
+                            <th>Effectif B</th>
+                            <th>Densite B</th>
+                            <th>Ecart effectif</th>
+                            <th>Ecart densite</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ligne in lignes_tableau %}
+                            <tr>
+                                <td>{{ ligne.annee }}</td>
+                                <td>{{ "{:,}".format(ligne.effectif_a|int).replace(",", " ") if ligne.effectif_a is not none else "-" }}</td>
+                                <td>{{ ligne.densite_a if ligne.densite_a is not none else "-" }}</td>
+                                <td>{{ "{:,}".format(ligne.effectif_b|int).replace(",", " ") if ligne.effectif_b is not none else "-" }}</td>
+                                <td>{{ ligne.densite_b if ligne.densite_b is not none else "-" }}</td>
+                                <td>
+                                    {% if ligne.ecart_effectif is not none %}
+                                        {{ "{:+,}".format(ligne.ecart_effectif|int).replace(",", " ") }}
+                                        {% if ligne.ecart_effectif_pourcentage is not none %}
+                                            ({{ "{:+.1f}".format(ligne.ecart_effectif_pourcentage).replace(".0", "") }} %)
+                                        {% endif %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if ligne.ecart_densite is not none %}
+                                        {{ "{:+.2f}".format(ligne.ecart_densite) }}
+                                        {% if ligne.ecart_densite_pourcentage is not none %}
+                                            ({{ "{:+.1f}".format(ligne.ecart_densite_pourcentage).replace(".0", "") }} %)
+                                        {% endif %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    {% elif not message_erreur %}
+        <section class="card">
+            <div class="empty-state">
+                <h3>Aucune donnee disponible</h3>
+                <p>Essayez une autre profession, un autre territoire ou une autre periode.</p>
+            </div>
+        </section>
+    {% endif %}
+{% endif %}
+
+<script>
+    async function chargerDepartementsComparaison(regionSelect) {
+        const departementSelect = document.getElementById(regionSelect.dataset.departementTarget);
+        const selectedDept = departementSelect.dataset.selected || "";
+        const option = regionSelect.selectedOptions[0];
+
+        departementSelect.innerHTML = '<option value="">-- Choisir un departement --</option>';
+        departementSelect.disabled = false;
+        departementSelect.required = true;
+
+        if (!regionSelect.value) {
+            return;
+        }
+
+        if (option && (option.dataset.code === "99" || option.dataset.libelle.toUpperCase() === "FRANCE")) {
+            departementSelect.innerHTML = '<option value="">France entiere</option>';
+            departementSelect.disabled = true;
+            departementSelect.required = false;
+            return;
+        }
+
+        const response = await fetch(`/api/departements/${regionSelect.value}`);
+        const departements = await response.json();
+
+        const optionTous = document.createElement("option");
+        optionTous.value = "all";
+        optionTous.textContent = "Tous les departements de la region";
+        optionTous.selected = selectedDept === "all";
+        departementSelect.appendChild(optionTous);
+
+        for (const dept of departements) {
+            const optionDepartement = document.createElement("option");
+            optionDepartement.value = dept.id;
+            optionDepartement.textContent = `${dept.code} - ${dept.libelle}`;
+            optionDepartement.selected = selectedDept && String(dept.id) === String(selectedDept);
+            departementSelect.appendChild(optionDepartement);
+        }
+    }
+
+    document.querySelectorAll("[data-departement-target]").forEach(regionSelect => {
+        regionSelect.addEventListener("change", () => {
+            const departementSelect = document.getElementById(regionSelect.dataset.departementTarget);
+            departementSelect.dataset.selected = "";
+            chargerDepartementsComparaison(regionSelect);
+        });
+        chargerDepartementsComparaison(regionSelect);
+    });
+</script>
+
+{% if has_donnees %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const lignesComparaison = {{ lignes_tableau|tojson }};
+    const labelA = {{ label_a|tojson }};
+    const labelB = {{ label_b|tojson }};
+    const dernierA = {{ dernier_a|tojson }};
+    const dernierB = {{ dernier_b|tojson }};
+
+    new Chart(document.getElementById("comparisonChart"), {
+        type: "line",
+        data: {
+            labels: lignesComparaison.map(ligne => String(ligne.annee)),
+            datasets: [
+                {
+                    label: labelA,
+                    data: lignesComparaison.map(ligne => ligne.effectif_a),
+                    borderColor: "#0057A4",
+                    backgroundColor: "rgba(0, 87, 164, 0.12)",
+                    tension: 0.35,
+                    fill: true
+                },
+                {
+                    label: labelB,
+                    data: lignesComparaison.map(ligne => ligne.effectif_b),
+                    borderColor: "#16A34A",
+                    backgroundColor: "rgba(22, 163, 74, 0.10)",
+                    tension: 0.35,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: "bottom"
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: value => Number(value).toLocaleString("fr-FR")
+                    }
+                }
+            }
+        }
+    });
+
+    const pieCanvas = document.getElementById("comparisonPieChart");
+
+    if (pieCanvas && dernierA && dernierB) {
+        new Chart(pieCanvas, {
+            type: "pie",
+            data: {
+                labels: [labelA, labelB],
+                datasets: [{
+                    data: [
+                        Number(dernierA.effectif || 0),
+                        Number(dernierB.effectif || 0)
+                    ],
+                    backgroundColor: ["#0057A4", "#16A34A"],
+                    borderColor: "#FFFFFF",
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: "bottom"
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: context => {
+                                const total = context.dataset.data.reduce((sum, value) => sum + value, 0);
+                                const value = context.raw || 0;
+                                const percent = total ? (value / total * 100).toFixed(1) : "0.0";
+
+                                return `${context.label}: ${value.toLocaleString("fr-FR")} (${percent} %)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endif %}
+{% endblock %}
