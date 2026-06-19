@@ -3,25 +3,39 @@
 {% block titre %}Prescriptions / DataLynx{% endblock %}
 
 {% block contenu %}
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<section class="hero">
+    <div>
+        <span class="hero-badge">Prescriptions · Data Ameli</span>
+        <h2>Consulter les prescriptions</h2>
+        <p>
+            Analysez les montants de prescriptions par catégorie, territoire et année.
+            Les données sont récupérées depuis l’API Data Ameli.
+        </p>
+    </div>
+</section>
 <section class="card form-card" id="analyse">
     <div class="section-title">
         <div>
-            <span class="mini-label">Analyse principale</span>
-            <h2>Consulter les prescriptions</h2>
+            <span class="mini-label">Filtre d'analyse</span>
+            <h2>Choisir les critères</h2>
             <p>
-                Remplissez le formulaire pour interroger l’API Data Ameli et afficher
-                les données correspondant à votre sélection.
+                Sélectionnez un type de prescription, un territoire et une année.
+                Les résultats seront affichés sous forme de KPI, tableau et graphique.
             </p>
         </div>
     </div>
 
-    <form action="{{ url_for('prescriptions.resultats') }}" method="get" class="form-grid">
+    <form action="{{ url_for('prescriptions.index') }}" method="get" class="form-grid">
         <div class="form-field">
             <label for="prescriptions">Types de prescriptions</label>
             <select name="prescription_id" id="prescriptions" required>
                 <option value="">-- Choisir un type de prescription --</option>
-                {% for p in prescriptions %}
-                    <option value="{{ p.id }}">{{ p.libelle[0]|upper }}{{ p.libelle[1:] }}</option>
+                {% for p in prescriptionsliste %}
+                    <option value="{{ p.id }}" {% if prescriptions and prescriptions.id == p.id %}selected{% endif %}>
+                        {{ p.libelle[0]|upper }}{{ p.libelle[1:] }}
+                    </option>
                 {% endfor %}
             </select>
         </div>
@@ -35,6 +49,7 @@
                         value="{{ r.id }}"
                         data-code="{{ r.code }}"
                         data-libelle="{{ r.libelle }}"
+                        {% if region and region.id == r.id %}selected{% endif %}
                     >
                         {{ r.libelle }}
                     </option>
@@ -53,7 +68,9 @@
             <label for="first_year">Année</label>
             <select name="year" id="year" required>
                 {% for a in range(2010, 2025) %}
-                    <option value="{{ a }}" {% if a == 2024 %}selected{% endif %}>{{ a }}</option>
+                    <option value="{{ a }}" {% if year == a or (not year and a == 2024) %}selected{% endif %}>
+                        {{ a }}
+                    </option>
                 {% endfor %}
             </select>
         </div>
@@ -64,4 +81,207 @@
 </section>
 
 <script src="{{ url_for('static', filename='js/cascade.js') }}"></script>
+
+{% if has_searched %}
+    <section class="card">
+        <div class="section-title">
+            <div>
+                <span class="mini-label">Sélection</span>
+                <h2>Résumé de la recherche</h2>
+                <p>
+                    Type de prescription :
+                    <strong>
+                        {{ prescriptions.libelle[0]|upper }}{{ prescriptions.libelle[1:] }}
+                    </strong>
+                    {% if dept %}
+                        <br>
+                        Région :
+                        <strong>{{ region.libelle }}</strong>
+                        <br>
+                        Département :
+                        <strong>{{ territoire_label }}</strong>
+                    {% elif region.libelle == "FRANCE" %}
+                        <br>
+                        Territoire :
+                        <strong>France entière</strong>
+                    {% elif region %}
+                        <br>
+                        Région :
+                        <strong>{{ region.libelle }}</strong>
+                    {% endif %}
+                    <br>
+                    Année :
+                    <strong>{{ year }}</strong>
+                </p>
+            </div>
+        </div>
+    </section>
+    <section class="kpi-grid">
+        <div class="kpi-card">
+            <span class="kpi-label">Année</span>
+            <strong>{{ year }}</strong>
+        </div>
+
+        <div class="kpi-card">
+            <span class="kpi-label">Montant total global</span>
+            <strong>{{ "{:,}".format(montant_total_global|int).replace(",", " ") }} €</strong>
+        </div>
+
+        <div class="kpi-card">
+            <span class="kpi-label">Moyenne des montants moyen</span>
+            <strong>{{ "{:,}".format(montant_moyen_global|int).replace(",", " ") }} €</strong>
+        </div>
+
+        {% if territoire_label == "FRANCE" %}
+            <div class="kpi-card">
+                <span class="kpi-label">Territoire</span>
+                <strong>France entière</strong>
+            </div>
+        {% else %}
+            <div class="kpi-card">
+                <span class="kpi-label">Territoire</span>
+                <strong>{{ territoire_label }}</strong>
+            </div>
+        {% endif %}
+    </section>
+
+    {% if resultats %}
+
+    <section class="card">
+    <div class="section-title">
+        <div>
+            <h3>Tableau des résultats</h3>
+            <p>
+                Données récupérées depuis l’API Data Ameli pour la sélection choisie.
+            </p>
+        </div>
+    </div>
+    <div class="table-wrapper">
+        <table id="TabPrescriptions">
+            <thead>
+                <tr>
+                    <th>Année</th>
+                    <th>Profession</th>
+                    <th>Poste</th>
+                    <th>Montant total (en €)</th>
+                    <th>Montant moyen (en €)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in resultats %}
+                    <tr>
+                        <td>{{ r.annee|string|truncate(10, True, '') }}</td>
+                        <td>{{ r.profession_sante }}</td>
+                        <td>{{ r.libelle_poste_prescription[0]|upper }}{{ r.libelle_poste_prescription[1:] }}</td>
+                        <td>{{ "{:,}".format(r.montant_total_prescription_integer|int).replace(",", " ") }} €</td>
+                        <td>{{ "{:,}".format(r.montant_moyen_prescription_integer|int).replace(",", " ") }} €</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('#TabPrescriptions').DataTable({
+                "paging": false,
+                "searching": true,
+                "ordering": false,
+                "info": false,
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json"
+                }
+            });
+        });
+    </script>
+    {% else %}
+        <div class="empty-state">
+            <h4>Aucune donnée disponible</h4>
+            <p>
+                L’API n’a retourné aucune valeur pour cette sélection. Essayez avec
+                une autre profession, un autre département ou une autre année.
+            </p>
+            <a href="{{ url_for('prescriptions.index') }}" class="btn-link">Modifier la recherche</a>
+        </div>
+
+    {% endif %}
+</section>
+<section class="card">
+    <div class="section-title">
+        <div>
+            <h3>Montants totaux au poste {{ prescriptions.libelle[0]|upper }}{{ prescriptions.libelle[1:] }} en {{ year }}</h3>
+            <p>
+                Ce graphique montre les montants totaux des prescriptions pour le poste sélectionné sur l’année choisie.
+            </p>
+        </div>
+    </div>
+    <div style="max-width: 1100px; height: 450px; margin: 30px auto;">
+        <canvas id="graphiqueHorizontal"></canvas>
+    </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const labelsPrescriptions = [{% for r in resultats %}"{{ r.profession_sante[0]|upper }}{{ r.profession_sante[1:] }}",{% endfor %}];
+        
+        const montantsTotaux = [{% for r in resultats %}{{ r.montant_total_prescription_integer or 0 }},{% endfor %}];
+
+        const ctx = document.getElementById('graphiqueHorizontal').getContext('2d');
+        
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labelsPrescriptions,
+                datasets: [{
+                    label: 'Montant Total (€)',
+                    data: montantsTotaux,
+                    backgroundColor: '#0057A4',
+                    borderColor: '#0057A4',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        type: 'logarithmic',
+                        beginAtZero: true,
+                        ticks: {
+                            autoSkip: true,
+                            maxTicksLimit: 15,
+                            maxrotation: 0,
+                            minrotation: 0,
+                            callback: function(value) {
+                                if (value >= 1000000) return (value / 1000000).toFixed(1) + ' M€';
+                                if (value >= 1000) return (value / 1000).toFixed(0) + ' K€';
+                                return value + ' €';
+                            }
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            autoSkip: false,
+                            font: { size: 10 },
+                            callback: function(value) {
+                                const label = this.getLabelForValue(value);
+                            if (label.length > 25) {
+                                return label.substring(0, 25) + '...';
+                            }
+                            return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endif %}
 {% endblock %}

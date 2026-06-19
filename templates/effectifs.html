@@ -44,7 +44,7 @@
 
     <div class="kpi-card">
         <span class="kpi-label">Effectif</span>
-        <strong>{{ premier.effectif }}</strong>
+        <strong>{{ "{:,}".format(premier.effectif|int).replace(",", " ") }}</strong>
     </div>
 
     <div class="kpi-card">
@@ -52,10 +52,17 @@
         <strong>{{ premier.densite }}</strong>
     </div>
 
-    <div class="kpi-card">
-        <span class="kpi-label">Territoire</span>
-        <strong>{{ territoire_label }}</strong>
-    </div>
+    {% if territoire_label == "FRANCE" %}
+        <div class="kpi-card">
+            <span class="kpi-label">Territoire</span>
+            <strong>France entière</strong>
+        </div>
+    {% else %}
+        <div class="kpi-card">
+            <span class="kpi-label">Territoire</span>
+            <strong>{{ territoire_label }}</strong>
+        </div>
+    {% endif %}
 
     <div class="kpi-card">
         <span class="kpi-label">Année</span>
@@ -64,7 +71,7 @@
 
     <div class="kpi-card">
         <span class="kpi-label">Effectif</span>
-        <strong>{{ dernier.effectif }}</strong>
+        <strong>{{ "{:,}".format(dernier.effectif|int).replace(",", " ") }}</strong>
     </div>
 
     <div class="kpi-card">
@@ -108,7 +115,7 @@
                     {% for r in resultats %}
                         <tr>
                             <td>{{ r.annee|string|truncate(10, True, '') }}</td>
-                            <td>{{ r.effectif }}</td>
+                            <td>{{ "{:,}".format(r.effectif|int).replace(",", " ") }}</td>
                             <td>{{ r.densite }}</td>
                         </tr>
                     {% endfor %}

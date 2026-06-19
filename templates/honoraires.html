@@ -228,8 +228,8 @@
                         <td>{{ r.niveau_1 }}</td>
                         <td>{{ r.niveau_2 if r.niveau_2 else "—" }}</td>
                         <td>{{ r.niveau_3 if r.niveau_3 else "—" }}</td>
-                        <td>{{ r.montant_honoraires }}</td>
-                        <td>{{ r.montant_honoraires_moyens }}</td>
+                        <td>{{ "{:,}".format(r.montant_honoraires|int).replace(",", " ") }}</td>
+                        <td>{{ "{:,}".format(r.montant_honoraires_moyens|int).replace(",", " ") }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

@@ -2,6 +2,9 @@ const regionSelect = document.getElementById("region");
 const departementSelect = document.getElementById("departement");
 
 if (regionSelect && departementSelect) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedDeptParameter = urlParams.get("departement_id") || "";
+
     const estFranceSelectionnee = () => {
         const option = regionSelect.selectedOptions[0];
 
@@ -11,7 +14,7 @@ if (regionSelect && departementSelect) {
         );
     };
 
-    const chargerDepartements = async () => {
+    const chargerDepartements = async (isInitialLoad = false) => {
         const regionId = regionSelect.value;
 
         departementSelect.innerHTML = '<option value="">-- Choisir un département --</option>';
@@ -36,12 +39,20 @@ if (regionSelect && departementSelect) {
             const optionTous = document.createElement("option");
             optionTous.value = "all";
             optionTous.textContent = "Tous les départements de la région";
+
+            if (isInitialLoad && selectedDeptParameter === "all") {
+                optionTous.selected = true;
+            }
             departementSelect.appendChild(optionTous);
 
             for (const dept of departements) {
                 const option = document.createElement("option");
                 option.value = dept.id;
                 option.textContent = `${dept.code} - ${dept.libelle}`;
+
+                if (isInitialLoad && selectedDeptParameter && String(dept.id) === String(selectedDeptParameter)) {
+                    option.selected = true;
+                }
                 departementSelect.appendChild(option);
             }
         } catch (error) {
@@ -49,6 +60,6 @@ if (regionSelect && departementSelect) {
         }
     };
 
-    regionSelect.addEventListener("change", chargerDepartements);
-    chargerDepartements();
+    regionSelect.addEventListener("change", () => chargerDepartements(false));
+    chargerDepartements(true);
 }

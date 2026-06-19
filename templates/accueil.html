@@ -36,7 +36,7 @@
                     <span class="preview-kpi-label">
                         Effectif {{ preview_item.annee|string|truncate(4, True, '') }}
                     </span>
-                    <strong>{{ preview_item.effectif }}</strong>
+                    <strong>{{ "{:,}".format(preview_item.effectif|int).replace(",", " ") }}</strong>
                 </div>
 
                 <div class="preview-kpi-card">
