@@ -136,8 +136,8 @@
                     <span class="mini-label">Selection</span>
                     <h2>{{ profession.libelle }}</h2>
                     <p>
-                        <strong>{{ label_a }}</strong> compare a <strong>{{ label_b }}</strong>,
-                        de {{ first_year }} a {{ last_year }}.
+                        <strong>{{ label_a }}</strong> comparé à <strong>{{ label_b }}</strong>,
+                        de {{ first_year }} à {{ last_year }}.
                     </p>
                 </div>
             </div>
@@ -145,7 +145,7 @@
 
         <section class="kpi-grid">
             <div class="kpi-card">
-                <span class="kpi-label">Derniere annee commune</span>
+                <span class="kpi-label">Dernière année commune</span>
                 <strong>
                     {% if dernier_a and dernier_b %}
                         {{ dernier_a.annee|string|truncate(4, True, '') }}
@@ -182,21 +182,21 @@
 
         <section class="section-grid two-cols comparison-kpis">
             <article class="card">
-                <span class="mini-label">Densite</span>
+                <span class="mini-label">Densité</span>
                 <h3>{{ label_a }}</h3>
                 <p class="comparison-value">{{ dernier_a.densite if dernier_a else "-" }}</p>
             </article>
 
             <article class="card">
-                <span class="mini-label">Densite</span>
+                <span class="mini-label">Densité</span>
                 <h3>{{ label_b }}</h3>
                 <p class="comparison-value">{{ dernier_b.densite if dernier_b else "-" }}</p>
             </article>
         </section>
 
         <section class="card comparison-density-gap">
-            <span class="mini-label">Ecart de densite</span>
-            <h3>Difference entre {{ label_a }} et {{ label_b }}</h3>
+            <span class="mini-label">Écart de densité</span>
+            <h3>Différence entre {{ label_a }} et {{ label_b }}</h3>
             <p class="comparison-value">
                 {% if ecart_densite is not none %}
                     {{ "{:+.2f}".format(ecart_densite) }}
@@ -213,10 +213,10 @@
             <div class="section-title">
                 <div>
                     <span class="mini-label">Visualisation</span>
-                    <h2>Evolution des effectifs</h2>
+                    <h2>Évolution des effectifs</h2>
                     <p>
-                        Les courbes affichent l'evolution de la profession choisie
-                        sur les deux territoires selectionnes.
+                        Les courbes affichent l'évolution de la profession choisie
+                        sur les deux territoires selectionnés.
                     </p>
                 </div>
             </div>
@@ -229,10 +229,10 @@
                 <div class="section-title">
                     <div>
                         <span class="mini-label">Proportion</span>
-                        <h2>Repartition entre les deux territoires</h2>
+                        <h2>Répartition entre les deux territoires</h2>
                         <p>
                             Le camembert compare la part de chaque territoire dans
-                            l'effectif total observe sur la derniere annee disponible.
+                            l'effectif total observe sur la dernière année disponible.
                         </p>
                     </div>
                 </div>
@@ -246,10 +246,10 @@
         <section class="card">
             <div class="section-title">
                 <div>
-                    <span class="mini-label">Resultats detailles</span>
+                    <span class="mini-label">Résultats detaillés</span>
                     <h2>Tableau comparatif</h2>
                     <p>
-                        Les ecarts sont calcules par soustraction: territoire A moins
+                        Les écarts sont calculés par soustraction: territoire A moins
                         territoire B.
                     </p>
                 </div>
@@ -259,13 +259,13 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Annee</th>
+                            <th>Année</th>
                             <th>Effectif A</th>
                             <th>Densite A</th>
                             <th>Effectif B</th>
-                            <th>Densite B</th>
-                            <th>Ecart effectif</th>
-                            <th>Ecart densite</th>
+                            <th>Densité B</th>
+                            <th>Écart effectif</th>
+                            <th>Écart densité</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -305,8 +305,8 @@
     {% elif not message_erreur %}
         <section class="card">
             <div class="empty-state">
-                <h3>Aucune donnee disponible</h3>
-                <p>Essayez une autre profession, un autre territoire ou une autre periode.</p>
+                <h3>Aucune donnée disponible</h3>
+                <p>Essayez une autre profession, un autre territoire ou une autre période.</p>
             </div>
         </section>
     {% endif %}
