@@ -8,7 +8,7 @@
         <span class="hero-badge">Honoraires · Data Ameli</span>
         <h2>Consulter les honoraires</h2>
         <p>
-            Analysez les montants d’honoraires par catégorie, territoire et période.
+            Analysez les montants d’honoraires par catégorie, territoire et année.
             Les données sont récupérées depuis l’API Data Ameli.
         </p>
     </div>
@@ -20,7 +20,7 @@
             <span class="mini-label">Filtre d’analyse</span>
             <h2>Choisir les critères</h2>
             <p>
-                Sélectionnez un type d’honoraire, un territoire et une période.
+                Sélectionnez un type d’honoraire, un territoire et une année.
                 Les résultats seront affichés sous forme de KPI, tableau et graphique.
             </p>
         </div>
@@ -75,34 +75,13 @@
             </select>
         </div>
 
-        <div class="container-annee">
-            <div class="form-field annee">
-                <label for="first_year">Année de début</label>
-                <select
-                    name="first_year"
-                    id="first_year"
-                    required
-                    onchange="document.querySelectorAll('#last_year option').forEach(o => o.hidden = o.value < this.value)"
-                >
-                    {% for a in range(2010, 2025) %}
-                        <option value="{{ a }}" {% if first_year == a %}selected{% endif %}>{{ a }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="form-field annee">
-                <label for="last_year">Année de fin</label>
-                <select
-                    name="last_year"
-                    id="last_year"
-                    required
-                    onchange="document.querySelectorAll('#first_year option').forEach(o => o.hidden = o.value > this.value)"
-                >
-                    {% for a in range(2024, 2009, -1) %}
-                        <option value="{{ a }}" {% if last_year == a %}selected{% endif %}>{{ a }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+        <div class="form-field annee">
+            <label for="year">Année</label>
+            <select name="year" id="year" required>
+                {% for a in range(2010, 2025) %}
+                    <option value="{{ a }}" {% if year == a %}selected{% endif %}>{{ a }}</option>
+                {% endfor %}
+            </select>
         </div>
 
         <button type="submit">Afficher les résultats</button>
@@ -126,8 +105,8 @@
                 Territoire :
                 <strong>{{ territoire_label }}</strong>
                 <br>
-                Période :
-                <strong>{{ first_year }} → {{ last_year }}</strong>
+                Année :
+                <strong>{{ year }}</strong>
             </p>
         </div>
     </div>
@@ -150,25 +129,8 @@
     </div>
 
     <div class="kpi-card">
-        <span class="kpi-label">Première année</span>
-        <strong>
-            {% if evolution_honoraires %}
-                {{ evolution_honoraires[0].annee }}
-            {% else %}
-                {{ first_year }}
-            {% endif %}
-        </strong>
-    </div>
-
-    <div class="kpi-card">
-        <span class="kpi-label">Dernière année</span>
-        <strong>
-            {% if evolution_honoraires %}
-                {{ evolution_honoraires[-1].annee }}
-            {% else %}
-                {{ last_year }}
-            {% endif %}
-        </strong>
+        <span class="kpi-label">Année</span>
+        <strong>{{ year }}</strong>
     </div>
 
     <div class="kpi-card">
@@ -242,7 +204,7 @@
         <h3>Aucune donnée disponible</h3>
         <p>
             L’API n’a retourné aucun honoraire pour cette sélection.
-            Essayez un autre type d’honoraire, une autre période ou un autre territoire.
+            Essayez un autre type d’honoraire, une autre année ou un autre territoire.
         </p>
     </div>
 </section>

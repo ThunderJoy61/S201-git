@@ -44,8 +44,14 @@ def index():
     # On ne met pas type=int ici, car departement_id peut aussi valoir "all"
     selected_departement_id = request.args.get("departement_id")
 
-    first_year = request.args.get("first_year", default=2010, type=int)
-    last_year = request.args.get("last_year", default=2024, type=int)
+    year = request.args.get("year", type=int)
+
+    # Compatibilite avec d'anciens liens qui utilisaient encore la plage d'annees.
+    if year is None:
+        year = request.args.get("last_year", type=int)
+
+    if year is None:
+        year = request.args.get("first_year", default=2024, type=int)
 
     try:
         regions = db_session.query(Region).order_by(Region.libelle).all()
@@ -127,8 +133,8 @@ def index():
                 resultats = api.get_honoraires(
                     honoraire_selectionne,
                     departement_code,
-                    first_year,
-                    last_year,
+                    year,
+                    year,
                     region_selectionnee.code
                 )
 
@@ -155,8 +161,7 @@ def index():
             selected_honoraires_id=selected_honoraires_id,
             selected_region_id=selected_region_id,
             selected_departement_id=selected_departement_id,
-            first_year=first_year,
-            last_year=last_year,
+            year=year,
             api_error=api.last_error,
             message_erreur=message_erreur,
         )
