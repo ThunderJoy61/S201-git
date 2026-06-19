@@ -36,10 +36,14 @@ def index():
     departement_selectionne = None
     territoire_label = None
     message_erreur = None
+    departement_code = None
 
     selected_honoraires_id = request.args.get("honoraires_id", type=int)
     selected_region_id = request.args.get("region_id", type=int)
-    departement_selection = request.args.get("departement_id")
+
+    # On ne met pas type=int ici, car departement_id peut aussi valoir "all"
+    selected_departement_id = request.args.get("departement_id")
+
     first_year = request.args.get("first_year", default=2010, type=int)
     last_year = request.args.get("last_year", default=2024, type=int)
 
@@ -52,7 +56,6 @@ def index():
             TypeHonoraire.niveau_3
         ).all()
 
-        # Dès qu'il y a des paramètres dans l'URL, on considère que l'utilisateur a lancé une recherche
         if request.args:
             recherche_lancee = True
 
@@ -64,33 +67,42 @@ def index():
         if selected_honoraires_id:
             honoraire_selectionne = db_session.get(TypeHonoraire, selected_honoraires_id)
 
-        # Cas normal : département existant dans la BDD
-        france_selectionnee = region_selectionnee and region_selectionnee.code == "99"
-        region_entiere_selectionnee = departement_selection == "all"
+        france_selectionnee = (
+            region_selectionnee is not None
+            and str(region_selectionnee.code) == "99"
+        )
+
+        region_entiere_selectionnee = selected_departement_id == "all"
 
         if (
             not france_selectionnee
             and not region_entiere_selectionnee
-            and departement_selection
+            and selected_departement_id
         ):
             try:
                 departement_selectionne = db_session.get(
                     Departement,
-                    int(departement_selection)
+                    int(selected_departement_id)
                 )
             except ValueError:
                 departement_selectionne = None
 
-        # Cas spécial : France entière
         if france_selectionnee:
             departement_code = "999"
             territoire_label = "France entière"
+
         elif region_entiere_selectionnee:
             departement_code = "999"
-            territoire_label = region_selectionnee.libelle if region_selectionnee else None
+
+            if region_selectionnee:
+                territoire_label = region_selectionnee.libelle
+            else:
+                territoire_label = "Région entière"
+
         elif departement_selectionne:
             departement_code = departement_selectionne.code
             territoire_label = f"{departement_selectionne.code} — {departement_selectionne.libelle}"
+
         else:
             departement_code = None
 
@@ -108,9 +120,10 @@ def index():
                 departement_selectionne
                 and departement_selectionne.region_id != region_selectionnee.id
             ):
-                message_erreur = "Le departement choisi ne correspond pas a la region."
+                message_erreur = "Le département choisi ne correspond pas à la région."
 
             else:
+                # Résultats du tableau : respecte la plage choisie par l'utilisateur
                 resultats = api.get_honoraires(
                     honoraire_selectionne,
                     departement_code,
@@ -118,11 +131,13 @@ def index():
                     last_year,
                     region_selectionnee.code
                 )
+
+                # Graphique : toujours sur 2010 -> 2024
                 evolution_honoraires = api.get_evolution_honoraires(
                     honoraire_selectionne,
                     departement_code,
-                    first_year,
-                    last_year,
+                    2010,
+                    2024,
                     region_selectionnee.code
                 )
 
@@ -135,10 +150,11 @@ def index():
             recherche_lancee=recherche_lancee,
             honoraire_selectionne=honoraire_selectionne,
             departement_selectionne=departement_selectionne,
+            selected_departement_idne=departement_selectionne,
             territoire_label=territoire_label,
             selected_honoraires_id=selected_honoraires_id,
             selected_region_id=selected_region_id,
-            selected_departement_id=departement_selection,
+            selected_departement_id=selected_departement_id,
             first_year=first_year,
             last_year=last_year,
             api_error=api.last_error,

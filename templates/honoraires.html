@@ -272,8 +272,13 @@
         }
     }
 
-    const labelsHonoraires = Object.keys(montantsParAnnee).sort((a, b) => Number(a) - Number(b));
-    const dataHonoraires = labelsHonoraires.map(annee => montantsParAnnee[annee]);
+    const labelsHonoraires = [];
+
+    for (let annee = 2010; annee <= 2024; annee++) {
+        labelsHonoraires.push(String(annee));
+    }
+
+    const dataHonoraires = labelsHonoraires.map(annee => montantsParAnnee[annee] || 0);
     const canvasHonoraires = document.getElementById("honorairesChart");
     const messageHonorairesVide = document.getElementById("honorairesChartEmpty");
 
