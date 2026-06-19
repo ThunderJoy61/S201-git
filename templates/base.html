@@ -29,8 +29,7 @@
                     <a href="{{ url_for('dashboard.index') }}">Dashboard</a>
                     <a href="{{ url_for('honoraires.index') }}">Honoraires</a>
                     <a href="{{ url_for('prescriptions.index') }}">Prescriptions</a>
-                    <a href="#" class="nav-disabled">Comparaison</a>
-                    <a href="#" class="nav-disabled">Rechercher</a>
+                    <a href="{{ url_for('comparaison.index') }}">Comparaison</a>
                     <a href="{{ url_for('auth.logout') }}" class="nav-btn nav-btn-light">Déconnexion</a>
                 {% else %}
                     <a href="{{ url_for('auth.login') }}" class="nav-btn">Connexion</a>
@@ -56,8 +55,7 @@
             {% if session.get("user") %}
                 <a href="{{ url_for('honoraires.index') }}">Honoraires</a>
                 <a href="{{ url_for('prescriptions.index') }}">Prescriptions</a>
-                <a href="#" class="side-disabled">Comparaison</a>
-                <a href="#" class="side-disabled">Rechercher</a>
+                <a href="{{ url_for('comparaison.index') }}">Comparaison</a>
                 <a href="{{ url_for('auth.logout') }}">Déconnexion</a>
             {% else %}
                 <a href="{{ url_for('auth.login') }}">Connexion</a>
@@ -84,6 +82,7 @@
                     <a href="{{ url_for('dashboard.index') }}">Dashboard</a>
                     <a href="{{ url_for('honoraires.index') }}">Honoraires</a>
                     <a href="{{ url_for('prescriptions.index') }}">Prescriptions</a>
+                    <a href="{{ url_for('comparaison.index') }}">Comparaison</a>
                 {% else %}
                     <a href="{{ url_for('auth.login') }}">Connexion</a>
                 {% endif %}

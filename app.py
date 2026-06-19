@@ -9,6 +9,7 @@ from controllers.pages import bp_pages
 from controllers.dashboard import bp_dashboard
 from controllers.honoraires import bp_honoraires
 from controllers.prescriptions import bp_prescriptions
+from controllers.comparaison import bp_comparaison
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -20,6 +21,7 @@ app.register_blueprint(bp_pages)
 app.register_blueprint(bp_dashboard)
 app.register_blueprint(bp_honoraires)
 app.register_blueprint(bp_prescriptions)
+app.register_blueprint(bp_comparaison)
 
 
 @app.errorhandler(404)
