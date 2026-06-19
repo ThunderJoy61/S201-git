@@ -355,3 +355,39 @@ class AmeliAPI:
                 "order_by": "montant_total_prescription_integer DESC",
             },
         )
+    
+    def get_repartition_sexe(self, profession, departement_code, year, region_code=None):
+        """Récupère la répartition par sexe pour une profession, un territoire et une année."""
+        where = (
+            f'profession_sante="{self._escape_value(profession)}" AND '
+            f'{self._filtre_territoire(departement_code, region_code)} AND '
+            f'year(annee) = {int(year)} AND '
+            f'libelle_classe_age="Tout âge" AND '
+            f'libelle_sexe!="tout sexe"'
+        )
+        return self._requete(
+            "demographie-effectifs-et-les-densites",
+            {
+                "select": "libelle_sexe, effectif",
+                "where": where,
+                "limit": 100,
+            }
+        )
+
+    def get_repartition_age(self, profession, departement_code, year, region_code=None):
+        """Récupère la répartition par tranche d'âge pour une profession, un territoire et une année."""
+        where = (
+            f'profession_sante="{self._escape_value(profession)}" AND '
+            f'{self._filtre_territoire(departement_code, region_code)} AND '
+            f'year(annee) = {int(year)} AND '
+            f'libelle_classe_age!="Tout âge" AND '
+            f'libelle_sexe="tout sexe"'
+        )
+        return self._requete(
+            "demographie-effectifs-et-les-densites",
+            {
+                "select": "libelle_classe_age, effectif",
+                "where": where,
+                "limit": 100,
+            }
+        )
