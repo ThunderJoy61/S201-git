@@ -254,9 +254,12 @@
                     </p>
                 </div>
             </div>
-
+            
             <div class="table-wrapper">
-                <table>
+                <button onclick="exporterTableauEnCSV()" style="position: absolute;width: 150px; font-size: 14px; right: 250px; bottom: -2140px">
+                Exporter en csv
+                </button>
+                <table id="TabComparaison">
                     <thead>
                         <tr>
                             <th>Année</th>
@@ -450,6 +453,44 @@
             }
         });
     }
+
+    function exporterTableauEnCSV() {
+        const lignes = [];
+        const table = document.getElementById("TabComparaison");
+        
+        if (!table) {
+            alert("Aucun tableau disponible pour l'export.");
+            return;
+        }
+
+        const lignesHtml = table.querySelectorAll("tr");
+        
+        for (const ligne of lignesHtml) {
+            const celluleDonnees = [];
+            const cellules = ligne.querySelectorAll("th, td");
+            
+            for (const cellule of cellules) {
+                let texte = cellule.innerText.trim().replace(/\n/g, " ");
+                if (texte.includes(";") || texte.includes('"')) {
+                    texte = `"${texte.replace(/"/g, '""')}"`;
+                }
+                celluleDonnees.push(texte);
+            }
+            lignes.push(celluleDonnees.join(";"));
+        }
+
+        const contenuCsv = "\uFEFF" + lignes.join("\n");
+        const blob = new Blob([contenuCsv], { type: "text/csv;charset=utf-8;" });
+        const lien = document.createElement("a");
+        lien.href = URL.createObjectURL(blob);
+        lien.setAttribute("download", "export_comparaison.csv");
+        lien.style.visibility = "hidden";
+        
+        document.body.appendChild(lien);
+        lien.click();
+        document.body.removeChild(lien);
+    }
+
 </script>
 {% endif %}
 {% endblock %}

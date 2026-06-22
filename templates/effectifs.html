@@ -94,7 +94,8 @@
 <section class="card">
     <div class="section-title">
         <div>
-            <h3>Tableau des résultats</h3>
+            <span class="mini-label">Résultats détaillés</span>
+            <h3>Tableau des effectifs</h3>
             <p>
                 Données récupérées depuis l’API Data Ameli pour la sélection choisie.
             </p>
@@ -102,8 +103,11 @@
     </div>
 
     {% if resultats %}
+        <button onclick="exporterTableauEnCSV()" style="position: absolute;width: 150px; font-size: 14px; right: 250px; bottom: 0px">
+            Exporter en csv
+        </button>
         <div class="table-wrapper">
-            <table>
+            <table id="TabEffectifs">
                 <thead>
                     <tr>
                         <th>Année</th>
@@ -253,46 +257,83 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 
-const ctxSexe = document.getElementById("graphiqueSexe");
-const ctxAge = document.getElementById("graphiqueAge");
+    const ctxSexe = document.getElementById("graphiqueSexe");
+    const ctxAge = document.getElementById("graphiqueAge");
 
-if (ctxSexe && ctxAge) {
-    new Chart(ctxSexe, {
-        type: "doughnut",
-        data: {
-            labels: {{ sexe_labels|tojson }},
-            datasets: [{
-                data: {{ sexe_data|tojson }},
-                backgroundColor: ["pink", "lightblue", "red", "black"],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { position: "bottom" } }
-        }
-    });
+    if (ctxSexe && ctxAge) {
+        new Chart(ctxSexe, {
+            type: "doughnut",
+            data: {
+                labels: {{ sexe_labels|tojson }},
+                datasets: [{
+                    data: {{ sexe_data|tojson }},
+                    backgroundColor: ["pink", "lightblue", "red", "black"],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: "bottom" } }
+            }
+        });
 
-    new Chart(ctxAge, {
-        type: "doughnut",
-        data: {
-            labels: {{ age_labels|tojson }},
-            datasets: [{
-                data: {{ age_data|tojson }},
-                backgroundColor: ["#2a9d8f", "#e76f51", "#f4a261", 
-                                  "#e9c46a", "#264653", "#457b9d", 
-                                  "#1d3557", "#a8dadc", "#e63946", 
-                                  "#8338ec", "#ff006e", "#3a86ff", 
-                                  "#ffbe0b"
-                                 ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { position: "bottom" } }
+        new Chart(ctxAge, {
+            type: "doughnut",
+            data: {
+                labels: {{ age_labels|tojson }},
+                datasets: [{
+                    data: {{ age_data|tojson }},
+                    backgroundColor: ["#2a9d8f", "#e76f51", "#f4a261", 
+                                    "#e9c46a", "#264653", "#457b9d", 
+                                    "#1d3557", "#a8dadc", "#e63946", 
+                                    "#8338ec", "#ff006e", "#3a86ff", 
+                                    "#ffbe0b"
+                                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: "bottom" } }
+            }
+        });
+    }
+
+    function exporterTableauEnCSV() {
+        const lignes = [];
+        const table = document.getElementById("TabEffectifs");
+        
+        if (!table) {
+            alert("Aucun tableau disponible pour l'export.");
+            return;
         }
-    });
-}
+
+        const lignesHtml = table.querySelectorAll("tr");
+        
+        for (const ligne of lignesHtml) {
+            const celluleDonnees = [];
+            const cellules = ligne.querySelectorAll("th, td");
+            
+            for (const cellule of cellules) {
+                let texte = cellule.innerText.trim().replace(/\n/g, " ");
+                if (texte.includes(";") || texte.includes('"')) {
+                    texte = `"${texte.replace(/"/g, '""')}"`;
+                }
+                celluleDonnees.push(texte);
+            }
+            lignes.push(celluleDonnees.join(";"));
+        }
+
+        const contenuCsv = "\uFEFF" + lignes.join("\n");
+        const blob = new Blob([contenuCsv], { type: "text/csv;charset=utf-8;" });
+        const lien = document.createElement("a");
+        lien.href = URL.createObjectURL(blob);
+        lien.setAttribute("download", "export_effectifs.csv");
+        lien.style.visibility = "hidden";
+        
+        document.body.appendChild(lien);
+        lien.click();
+        document.body.removeChild(lien);
+    }
 </script>
 {% endblock %}
