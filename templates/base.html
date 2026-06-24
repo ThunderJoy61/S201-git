@@ -38,29 +38,40 @@
         </div>
     </header>
 
-    <aside class="side-menu" id="sideMenu" aria-label="Menu rapide">
-        <a href="{{ url_for('accueil.index') }}" class="side-menu-logo">
-            <img
-                src="{{ url_for('static', filename='images/favicon.png') }}"
-                alt="Logo DataLynx"
-                class="side-logo-img"
-            >
-            <span>DataLynx</span>
-        </a>
+    <button class="menu-toggle" id="menuToggle" type="button" aria-label="Ouvrir le menu" aria-controls="sideMenu" aria-expanded="false">
+        <span></span><span></span><span></span>
+    </button>
+
+    <div class="side-menu-overlay" id="sideMenuOverlay" aria-hidden="true"></div>
+
+    <aside class="side-menu" id="sideMenu" aria-label="Navigation principale" aria-hidden="true">
+        <div class="side-menu-header">
+            <a href="{{ url_for('accueil.index') }}" class="side-menu-logo">
+                <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="" class="side-logo-img">
+                <span>DataLynx</span>
+            </a>
+            <button class="side-menu-close" id="sideMenuClose" type="button" aria-label="Fermer le menu">&times;</button>
+        </div>
 
         <nav class="side-menu-nav">
-            <a href="{{ url_for('accueil.index') }}">Accueil</a>
-            <a href="{{ url_for('pages.presentation') }}">Données</a>
-
+            <a href="{{ url_for('accueil.index') }}" {% if request.endpoint == 'accueil.index' %}class="is-active" aria-current="page"{% endif %}>Accueil</a>
+            <a href="{{ url_for('pages.presentation') }}" {% if request.endpoint == 'pages.presentation' %}class="is-active" aria-current="page"{% endif %}>Données</a>
             {% if session.get("user") %}
-                <a href="{{ url_for('honoraires.index') }}">Honoraires</a>
-                <a href="{{ url_for('prescriptions.index') }}">Prescriptions</a>
-                <a href="{{ url_for('comparaison.index') }}">Comparaison</a>
-                <a href="{{ url_for('auth.logout') }}">Déconnexion</a>
-            {% else %}
-                <a href="{{ url_for('auth.login') }}">Connexion</a>
+                <a href="{{ url_for('dashboard.index') }}" {% if request.endpoint == 'dashboard.index' %}class="is-active" aria-current="page"{% endif %}>Dashboard</a>
+                <a href="{{ url_for('honoraires.index') }}" {% if request.blueprint == 'honoraires' %}class="is-active" aria-current="page"{% endif %}>Honoraires</a>
+                <a href="{{ url_for('prescriptions.index') }}" {% if request.blueprint == 'prescriptions' %}class="is-active" aria-current="page"{% endif %}>Prescriptions</a>
+                <a href="{{ url_for('comparaison.index') }}" {% if request.blueprint == 'comparaison' %}class="is-active" aria-current="page"{% endif %}>Comparaison</a>
             {% endif %}
         </nav>
+
+        <div class="side-menu-footer">
+            <p>Explorez simplement les données de santé françaises issues de Data Ameli.</p>
+            {% if session.get("user") %}
+                <a href="{{ url_for('auth.logout') }}" class="side-menu-account">Déconnexion</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="side-menu-account">Connexion</a>
+            {% endif %}
+        </div>
     </aside>
 
     <main class="container">
