@@ -660,6 +660,38 @@ table {
     margin-top: 16px;
 }
 
+#TabEffectifs th:first-child {
+    border-top-left-radius: 12px;
+}
+
+#TabEffectifs th:last-child {
+    border-top-right-radius: 12px;
+}
+
+#TabComparaison th:first-child {
+    border-top-left-radius: 12px;
+}
+
+#TabComparaison th:last-child {
+    border-top-right-radius: 12px;
+}
+
+#TabPrescriptions th:first-child {
+    border-top-left-radius: 12px;
+}
+
+#TabPrescriptions th:last-child {
+    border-top-right-radius: 12px;
+}
+
+#TabHonoraires th:first-child {
+    border-top-left-radius: 12px;
+}
+
+#TabHonoraires th:last-child {
+    border-top-right-radius: 12px;
+}
+
 th,
 td {
     padding: 13px;
