@@ -898,3 +898,19 @@ body.page-loading {
         transform: rotate(360deg);
     }
 }
+
+.export-csv-btn {
+    width: auto;
+    min-width: 150px;
+    padding: 11px 18px;
+    font-size: 14px;
+    white-space: nowrap;
+    align-self: flex-start;
+    flex-shrink: 0;
+}
+
+@media (max-width: 700px) {
+    .export-csv-btn {
+        width: 100%;
+    }
+}
