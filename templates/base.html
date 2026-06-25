@@ -23,7 +23,7 @@
 
             <nav class="main-nav">
                 <a href="{{ url_for('accueil.index') }}">Accueil</a>
-                <a href="{{ url_for('pages.presentation') }}">Données</a>
+                <a href="{{ url_for('pages.presentation') }}">A propos</a>
 
                 {% if session.get("user") %}
                     <a href="{{ url_for('dashboard.index') }}">Dashboard</a>
@@ -55,7 +55,7 @@
 
         <nav class="side-menu-nav">
             <a href="{{ url_for('accueil.index') }}" {% if request.endpoint == 'accueil.index' %}class="is-active" aria-current="page"{% endif %}>Accueil</a>
-            <a href="{{ url_for('pages.presentation') }}" {% if request.endpoint == 'pages.presentation' %}class="is-active" aria-current="page"{% endif %}>Données</a>
+            <a href="{{ url_for('pages.presentation') }}" {% if request.endpoint == 'pages.presentation' %}class="is-active" aria-current="page"{% endif %}>A propos</a>
             {% if session.get("user") %}
                 <a href="{{ url_for('dashboard.index') }}" {% if request.endpoint == 'dashboard.index' %}class="is-active" aria-current="page"{% endif %}>Dashboard</a>
                 <a href="{{ url_for('honoraires.index') }}" {% if request.blueprint == 'honoraires' %}class="is-active" aria-current="page"{% endif %}>Honoraires</a>
@@ -87,7 +87,7 @@
 
             <div class="footer-links">
                 <a href="{{ url_for('accueil.index') }}">Accueil</a>
-                <a href="{{ url_for('pages.presentation') }}">Données</a>
+                <a href="{{ url_for('pages.presentation') }}">A propos</a>
 
                 {% if session.get("user") %}
                     <a href="{{ url_for('dashboard.index') }}">Dashboard</a>
