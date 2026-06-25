@@ -282,3 +282,23 @@ Les PDF sont ignorés par `.gitignore`, mais les documents présents localement 
 ## Contexte académique
 
 Projet réalisé pour la SAÉ 2.01 « Développement d'une application » du BUT Informatique, IUT de Créteil-Vitry. Il s'appuie sur la base de dimensions produite en SAÉ 2.04 et sur le cahier des charges élaboré en SAÉ 2.05.
+
+## Preview du site
+
+Exemples de quelques pages disponibles sur le site :
+
+`Page d'accueil` :
+
+![Page D'accueil](ReadMeImages/PageAccueil.png)
+
+`Menu latéral` :
+
+![Menu latéral](ReadMeImages/SideMenu.png)
+
+`Page de connexion` :
+
+![Page de connexion](ReadMeImages/PageDeConnexion.png)
+
+`Page de comparaison` :
+
+![Page de comparaison](ReadMeImages/Comparaison.png)
